@@ -1,0 +1,65 @@
+{
+	"name": "fractuyo-ts",
+	"version": "1.0.0",
+	"description": "Biblioteca para la generación de comprobantes electrónicos según el estándar UBL 2.1 de SUNAT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc",
+		"prepare": "npm run build",
+		"test": "NODE_OPTIONS=--experimental-vm-modules jest",
+		"lint": "eslint . --ext .ts",
+		"lint:fix": "eslint . --ext .ts --fix",
+		"local-pack": "npm run build && npm pack && cd examples && npm install --no-save ../fractuyo-$npm_package_version.tgz && cd .. && rm fractuyo-$npm_package_version.tgz",
+		"example": "cd examples && npm start"
+	},
+	"keywords": [
+		"sunat",
+		"facturacion",
+		"electronica",
+		"peru",
+		"ubl",
+		"xml"
+	],
+	"author": "",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Blanni-Agency/fractuyo-ts.git"
+	},
+	"bugs": {
+		"url": "https://github.com/Blanni-Agency/fractuyo-ts/issues"
+	},
+	"homepage": "https://github.com/Blanni-Agency/fractuyo-ts#readme",
+	"dependencies": {
+		"@xmldom/xmldom": "^0.9.5",
+		"asn1js": "^3.0.5",
+		"jszip": "^3.10.1",
+		"written-number": "^0.11.1",
+		"xmldsigjs": "^2.6.1"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.5.11",
+		"@types/jsdom": "^21.1.7",
+		"@types/node": "^20.11.5",
+		"@typescript-eslint/eslint-plugin": "^6.19.0",
+		"@typescript-eslint/parser": "^6.19.0",
+		"eslint": "^8.56.0",
+		"jest": "^29.7.0",
+		"ts-jest": "^29.1.1",
+		"typescript": "^5.3.3"
+	}
+}
