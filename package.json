@@ -24,7 +24,13 @@
 		"lint": "eslint . --ext .ts",
 		"lint:fix": "eslint . --ext .ts --fix",
 		"local-pack": "npm run build && npm pack && cd examples && npm install --no-save ../fractuyo-$npm_package_version.tgz && cd .. && rm fractuyo-$npm_package_version.tgz",
-		"example": "cd examples && npm start"
+		"example": "cd examples && npm start",
+		"preversion": "npm run lint",
+		"version": "npm run build && git add -A dist",
+		"postversion": "git push && git push --tags",
+		"release:patch": "npm version patch && npm publish",
+		"release:minor": "npm version minor && npm publish",
+		"release:major": "npm version major && npm publish"
 	},
 	"keywords": [
 		"sunat",
