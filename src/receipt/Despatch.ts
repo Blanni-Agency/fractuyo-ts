@@ -287,7 +287,7 @@ class Despatch extends Receipt {
 			const accountingSupplierParty = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'DespatchSupplierParty')[0]
 			const id = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent || ''
 			const type = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.getAttribute('schemeID') || ''
-			taxpayer.setIdentification(new Identification(type, id))
+			taxpayer.setIdentification(new Identification(parseInt(type, 16), id))
 
 			const tradeName = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Name')[0]?.textContent || ''
 			taxpayer.setTradeName(tradeName)
@@ -322,7 +322,7 @@ class Despatch extends Receipt {
 			const accountingCustomerParty = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'DeliveryCustomerParty')[0]
 			const id = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent || ''
 			const type = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.getAttribute('schemeID') || ''
-			customer.setIdentification(new Identification(type, id))
+			customer.setIdentification(new Identification(parseInt(type, 16), id))
 			customer.setName(accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'RegistrationName')[0]?.textContent || '-')
 
 			// customer address
@@ -377,7 +377,7 @@ class Despatch extends Receipt {
 				const carrier = new Person()
 				carrier.setName(carrierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'RegistrationName')[0]?.textContent || '')
 				const identification = carrierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]
-				carrier.setIdentification(new Identification(identification?.getAttribute('schemeID') || '', identification?.textContent || ''))
+				carrier.setIdentification(new Identification(parseInt(identification?.getAttribute('schemeID') || '0', 16), identification?.textContent || ''))
 				this.setCarrier(carrier)
 			}
 

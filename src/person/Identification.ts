@@ -1,17 +1,15 @@
+import { DocumentType } from '../types'
+
 class Identification {
 	#number = ''
-	#type = ''
+	#type: DocumentType = DocumentType.OTROS
 
-	constructor(type: string, number: string) {
+	constructor(type: DocumentType, number: string) {
 		this.setIdentity(type, number)
 	}
 
-	/**
-	 * Set document number according type
-	 * @var t integer type according catalog 06
-	 */
-	setIdentity(type: string, number: string) {
-		if (Identification.validateDocumentNumber(parseInt(type, 16), number)) {
+	setIdentity(type: DocumentType, number: string) {
+		if (Identification.validateDocumentNumber(type, number)) {
 			this.#number = number
 			this.#type = type
 			return this
@@ -27,19 +25,19 @@ class Identification {
 		return this.#type
 	}
 
-	static validateDocumentNumber(documentType: number, number: string) {
+	static validateDocumentNumber(documentType: DocumentType, number: string) {
 		switch(documentType) {
-			case 0:
+			case DocumentType.OTROS:
 				return true
-			case 1://DNI o libreta electoral
+			case DocumentType.DNI://DNI o libreta electoral
 				//longitud: 8: exacta
 				//caracter: numérico
 				return (number != null && number.length === 8 && !isNaN(Number(number)))
-			case 4:
+			case DocumentType.CARNET_EXTRANJERIA:
 				//longitud: 12: máxima
 				//caracter: alfanumérico
 				return (number != null && number.length < 13)
-			case 6:
+			case DocumentType.RUC:
 				return Identification.validateRuc(number)
 			default:
 				return false

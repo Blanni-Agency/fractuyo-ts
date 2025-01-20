@@ -13,6 +13,7 @@ import Vehicle from './shipment/Vehicle'
 import Package from './shipment/Package'
 import Port from './shipment/Port'
 import Endpoint from './webservice/Endpoint'
+import { DocumentType } from './types'
 
 export {
   Invoice,
@@ -29,5 +30,6 @@ export {
   Vehicle,
   Package,
   Port,
-  Endpoint
+  Endpoint,
+  DocumentType
 }

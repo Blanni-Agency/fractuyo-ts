@@ -27,7 +27,7 @@ npm install fractuyo-ts
 - ✅ Notas de Crédito (CreditNote)
 - ✅ Notas de Débito (DebitNote)
 
-### Tipos de Identificación
+### Tipos de Documentos
 
 | Código | Descripción |
 |--------|-------------|

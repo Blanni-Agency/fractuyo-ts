@@ -1,0 +1,1 @@
+export { DocumentType } from './document' 
