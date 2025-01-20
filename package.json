@@ -1,6 +1,6 @@
 {
 	"name": "fractuyo-ts",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Biblioteca para la generación de comprobantes electrónicos según el estándar UBL 2.1 de SUNAT",
 	"type": "module",
 	"main": "./dist/index.js",
