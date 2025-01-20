@@ -1,11 +1,11 @@
-import Item from "./Item"
-import Receipt from "./Receipt"
-import Share from "./Share"
-import Sale from "./Sale"
-import NodesGenerator from "./xml/NodesGenerator"
-import Charge from "./Charge"
-import Taxpayer from "../person/Taxpayer"
-import Person from "../person/Person"
+import Item from './Item'
+import Receipt from './Receipt'
+import Share from './Share'
+import Sale from './Sale'
+import NodesGenerator from './xml/NodesGenerator'
+import Charge from './Charge'
+import Taxpayer from '../person/Taxpayer'
+import Person from '../person/Person'
 
 class Invoice extends Sale {
 	#orderReference: string | null = null
@@ -18,7 +18,7 @@ class Invoice extends Sale {
 	#discount: Charge | null = null
 
 	constructor(taxpayer: Taxpayer, customer: Person) {
-		super(taxpayer, customer, "Invoice")
+		super(taxpayer, customer, 'Invoice')
 	}
 
 	setDetractionPercentage(dp: number) {
@@ -27,7 +27,7 @@ class Invoice extends Sale {
 			return
 		}
 		this.#detractionPercentage = 0
-		throw new Error("Porcentaje de detracción inconsistente.")
+		throw new Error('Porcentaje de detracción inconsistente.')
 	}
 
 	getDetractionPercentage() {
@@ -81,10 +81,10 @@ class Invoice extends Sale {
 	setOrderReference(reference: string) {
 		if(reference.length > 0) {
 			if(/\s/g.test(reference)) {
-				throw new Error("La referencia numérica no debe contener espacios.")
+				throw new Error('La referencia numérica no debe contener espacios.')
 			}
 			if(reference.length > 20) {
-				throw new Error("La referencia numérica no debe tener 20 caracteres como máximo.")
+				throw new Error('La referencia numérica no debe tener 20 caracteres como máximo.')
 			}
 			this.#orderReference = reference
 		}
@@ -108,7 +108,7 @@ class Invoice extends Sale {
 
 	setOrderReferenceText(referenceText: string) {
 		if(!this.#orderReference) {
-			throw new Error("Asignar previamente la identidad de referencia.")
+			throw new Error('Asignar previamente la identidad de referencia.')
 		}
 		if(referenceText.length > 0) {
 			this.#orderReferenceText = referenceText
@@ -122,7 +122,7 @@ class Invoice extends Sale {
 	setDiscount(discountAmount: number) {
 		if(discountAmount > 0) {
 			this.#discount = new Charge(false)
-			this.#discount.setTypeCode("02")
+			this.#discount.setTypeCode('02')
 			this.#discount.setFactor(discountAmount / this.taxInclusiveAmount, this.lineExtensionAmount)
 
 			//Recalc amounts
@@ -172,7 +172,7 @@ class Invoice extends Sale {
 		switch(Number(this.getTypeCode())) {
 			case 1: // for "factura"
 				if(Number(this.getCustomer().getIdentification()?.getType()) !== 6) {
-					throw new Error("El cliente debe tener RUC.")
+					throw new Error('El cliente debe tener RUC.')
 				}
 		}
 
@@ -181,11 +181,11 @@ class Invoice extends Sale {
 				const sharesAmountFixed = Number(this.#sharesAmount.toFixed(2))
 				const detractionDiffFixed = Number((this.taxInclusiveAmount - this.#detractionAmount).toFixed(2))
 				if(sharesAmountFixed !== detractionDiffFixed) {
-					throw new Error("La suma de las cuotas difiere del total menos detracción.")
+					throw new Error('La suma de las cuotas difiere del total menos detracción.')
 				}
 			}
 			else if(Number(this.#sharesAmount.toFixed(2)) !== Number(this.taxInclusiveAmount.toFixed(2))) {
-				throw new Error("La suma de las cuotas difiere del total.")
+				throw new Error('La suma de las cuotas difiere del total.')
 			}
 		}
 	}
@@ -217,12 +217,12 @@ class Invoice extends Sale {
 		// All about sale
 		const xmlDoc = super.fromXml(xmlContent)
 
-		const orderReference = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, "OrderReference")[0]
+		const orderReference = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'OrderReference')[0]
 		if (orderReference) {
-			const orderReferenceId = orderReference.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent
+			const orderReferenceId = orderReference.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent
 			if (orderReferenceId) {
 				this.setOrderReference(orderReferenceId)
-				const orderReferenceText = orderReference.getElementsByTagNameNS(Receipt.namespaces.cbc, "CustomerReference")[0]?.textContent
+				const orderReferenceText = orderReference.getElementsByTagNameNS(Receipt.namespaces.cbc, 'CustomerReference')[0]?.textContent
 				if (orderReferenceText) {
 					this.setOrderReferenceText(orderReferenceText)
 				}
@@ -230,19 +230,19 @@ class Invoice extends Sale {
 		}
 
 		// All items. Always present.
-		const items = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, "InvoiceLine")
+		const items = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'InvoiceLine')
 		for (let i = 0; i < items.length; i++) {
-			const item = new Item(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "Description")[0]?.textContent || "")
-			item.setQuantity(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "InvoicedQuantity")[0]?.textContent || "")
+			const item = new Item(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'Description')[0]?.textContent || '')
+			item.setQuantity(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'InvoicedQuantity')[0]?.textContent || '')
 			item.setUnitValue(
-				items[i].getElementsByTagNameNS(Receipt.namespaces.cac, "Price")[0]?.getElementsByTagNameNS(Receipt.namespaces.cbc, "PriceAmount")[0]?.textContent || "",
+				items[i].getElementsByTagNameNS(Receipt.namespaces.cac, 'Price')[0]?.getElementsByTagNameNS(Receipt.namespaces.cbc, 'PriceAmount')[0]?.textContent || '',
 				false
 			)
-			item.setUnitCode(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "InvoicedQuantity")[0]?.getAttribute("unitCode") || "")
+			item.setUnitCode(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'InvoicedQuantity')[0]?.getAttribute('unitCode') || '')
 
 			// Warning because there are many tags with same name
-			item.setIgvPercentage(parseInt(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "Percent")[0]?.textContent || "0"))
-			item.setExemptionReasonCode(parseInt(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "TaxExemptionReasonCode")[0]?.textContent || "0"))
+			item.setIgvPercentage(parseInt(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'Percent')[0]?.textContent || '0'))
+			item.setExemptionReasonCode(parseInt(items[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'TaxExemptionReasonCode')[0]?.textContent || '0'))
 
 			item.calcMounts()
 			this.addItem(item)
@@ -250,19 +250,19 @@ class Invoice extends Sale {
 
 		// about detractions
 		// possible deduction
-		const paymentMean = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, "PaymentMeans")[0]
+		const paymentMean = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'PaymentMeans')[0]
 		if (paymentMean) { // exists deduction
-			const id = paymentMean.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent
-			if (id == "Detraccion") { // deduction exists
+			const id = paymentMean.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent
+			if (id == 'Detraccion') { // deduction exists
 				// look for more about this deduction
-				const paymentTerms = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, "PaymentTerms")
+				const paymentTerms = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'PaymentTerms')
 				for (const paymentTerm of paymentTerms) {
-					if (paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent != "Detraccion") {
+					if (paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent != 'Detraccion') {
 						continue
 					}
 
 					// we found it
-					this.setDetractionPercentage(parseInt(paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, "PaymentPercent")[0]?.textContent || "0"))
+					this.setDetractionPercentage(parseInt(paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentPercent')[0]?.textContent || '0'))
 					this.calcDetractionAmount()
 					break // then nothing else
 				}
@@ -270,22 +270,22 @@ class Invoice extends Sale {
 		}
 
 		// check if there are shares
-		const paymentTerms = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, "PaymentTerms")
+		const paymentTerms = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'PaymentTerms')
 		for (let i = 0; i < paymentTerms.length; ++i) {
-			if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent == "FormaPago") {
+			if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent == 'FormaPago') {
 				// If there is Credito means that next siblings are amounts
-				if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "PaymentMeansID")[0]?.textContent == "Credito") {
+				if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentMeansID')[0]?.textContent == 'Credito') {
 					++i // set index to next sibling
 					// iterate posible remaining shares
 					for (; i < paymentTerms.length; ++i) {
 						// if FormaPago is not found, means we don't have any share
-						if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent != "FormaPago") {
+						if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent != 'FormaPago') {
 							break
 						}
 						const share = new Share()
 						// capture date and amount
-						share.setAmount(paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "Amount")[0]?.textContent || "0")
-						const dateParts = (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, "PaymentDueDate")[0]?.textContent || "").split('-')
+						share.setAmount(paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'Amount')[0]?.textContent || '0')
+						const dateParts = (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentDueDate')[0]?.textContent || '').split('-')
 						if (dateParts.length === 3) {
 							share.setDueDate(new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2])))
 						}

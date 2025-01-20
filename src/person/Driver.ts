@@ -1,4 +1,4 @@
-import Person from "./Person.js"
+import Person from './Person.js'
 
 class Driver extends Person {
 	#license = ''

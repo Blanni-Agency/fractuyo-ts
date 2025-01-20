@@ -1,12 +1,12 @@
-import { OptionsSignTransform, Parse, SignedXml } from "xmldsigjs"
-import writtenNumber from "written-number"
-import JSZip from "jszip"
-import { DOMImplementation, DOMParser, XMLSerializer } from "@xmldom/xmldom"
-import SoapEnvelope from "./xml/SoapEnvelope"
-import Endpoint from "../webservice/Endpoint"
-import Item from "./Item"
-import Person from "../person/Person"
-import Taxpayer from "../person/Taxpayer"
+import { OptionsSignTransform, Parse, SignedXml } from 'xmldsigjs'
+import writtenNumber from 'written-number'
+import JSZip from 'jszip'
+import { DOMImplementation, DOMParser, XMLSerializer } from '@xmldom/xmldom'
+import SoapEnvelope from './xml/SoapEnvelope'
+import Endpoint from '../webservice/Endpoint'
+import Item from './Item'
+import Person from '../person/Person'
+import Taxpayer from '../person/Taxpayer'
 
 interface NameSpaces {
 	cac: string
@@ -28,8 +28,8 @@ class Receipt {
 	#numeration = 0
 	#typeCode = ''
 	#issueDate: Date | null = null
-	#ublVersion = "2.1"
-	#customizationId = "2.0"
+	#ublVersion = '2.1'
+	#customizationId = '2.0'
 	#hash = ''
 	#items: Item[] = []
 	xmlDocument: any
@@ -49,26 +49,26 @@ class Receipt {
 	}
 
 	createXmlWrapper() {
-		if (!this.#name) throw new Error("Nombre no definido")
+		if (!this.#name) throw new Error('Nombre no definido')
 		
 		const doc = (new DOMImplementation()).createDocument(`urn:oasis:names:specification:ubl:schema:xsd:${this.#name}-2`, this.#name)
 		this.xmlDocument = doc as any
 		
-		if (!this.xmlDocument?.documentElement) throw new Error("Error al crear el documento XML")
+		if (!this.xmlDocument?.documentElement) throw new Error('Error al crear el documento XML')
 		
-		this.xmlDocument.documentElement.setAttribute("xmlns:cac", Receipt.namespaces.cac)
-		this.xmlDocument.documentElement.setAttribute("xmlns:cbc", Receipt.namespaces.cbc)
-		this.xmlDocument.documentElement.setAttribute("xmlns:ds", Receipt.namespaces.ds)
-		this.xmlDocument.documentElement.setAttribute("xmlns:ext", Receipt.namespaces.ext)
+		this.xmlDocument.documentElement.setAttribute('xmlns:cac', Receipt.namespaces.cac)
+		this.xmlDocument.documentElement.setAttribute('xmlns:cbc', Receipt.namespaces.cbc)
+		this.xmlDocument.documentElement.setAttribute('xmlns:ds', Receipt.namespaces.ds)
+		this.xmlDocument.documentElement.setAttribute('xmlns:ext', Receipt.namespaces.ext)
 
 		// Space for appending signature
-		const extUblExtensions = this.xmlDocument.createElementNS(Receipt.namespaces.ext, "ext:UBLExtensions")
+		const extUblExtensions = this.xmlDocument.createElementNS(Receipt.namespaces.ext, 'ext:UBLExtensions')
 		this.xmlDocument.documentElement.appendChild(extUblExtensions)
 
-		const extUblExtension = this.xmlDocument.createElementNS(Receipt.namespaces.ext, "ext:UBLExtension")
+		const extUblExtension = this.xmlDocument.createElementNS(Receipt.namespaces.ext, 'ext:UBLExtension')
 		extUblExtensions.appendChild(extUblExtension)
 
-		const extExtensionContent = this.xmlDocument.createElementNS(Receipt.namespaces.ext, "ext:ExtensionContent")
+		const extExtensionContent = this.xmlDocument.createElementNS(Receipt.namespaces.ext, 'ext:ExtensionContent')
 		extUblExtension.appendChild(extExtensionContent)
 	}
 
@@ -85,7 +85,7 @@ class Receipt {
 	 */
 	getId(withType = false, compacted = false) {
 		if(this.#serie == undefined || this.#numeration == undefined) {
-			throw new Error("Serie o número incompletos.")
+			throw new Error('Serie o número incompletos.')
 		}
 		if(withType) {
 			return String(this.#typeCode).padStart(2, '0') + '-' + this.#serie + '-' + ( compacted ? this.#numeration : String(this.#numeration).padStart(8, '0') )
@@ -100,7 +100,7 @@ class Receipt {
 
 	setSerie(serie: string) {
 		if(serie.length != 4) {
-			throw new Error("Serie inconsistente")
+			throw new Error('Serie inconsistente')
 		}
 		this.#serie = serie
 	}
@@ -111,7 +111,7 @@ class Receipt {
 
 	setNumeration(number: number) {
 		if(number > 0x5F5E0FF) {
-			throw new Error("Numeración supera el límite.")
+			throw new Error('Numeración supera el límite.')
 		}
 		this.#numeration = number
 	}
@@ -199,26 +199,25 @@ class Receipt {
 		return this.#taxpayer
 	}
 
-	async sign(cryptoSubtle: SubtleCrypto, hashAlgorithm = "SHA-256", canonMethod: OptionsSignTransform = "c14n") {
+	async sign(cryptoSubtle: SubtleCrypto, hashAlgorithm = 'SHA-256', canonMethod: OptionsSignTransform = 'c14n') {
 		if(!this.xmlDocument) {
-			throw new Error("Documento XML no existe.")
+			throw new Error('Documento XML no existe.')
 		}
 
 		const alg = {
-			name: "RSASSA-PKCS1-v1_5",
+			name: 'RSASSA-PKCS1-v1_5',
 			hash: hashAlgorithm,
 			modulusLength: 1024,
 			publicExponent: new Uint8Array([1, 0, 1])
 		}
 
-		const certDer = this.#taxpayer.getCert()
 		const keyDer = this.#taxpayer.getKey()
 		
-		if (!keyDer) throw new Error("No se encontró la llave privada")
+		if (!keyDer) throw new Error('No se encontró la llave privada')
 		
-		const key = await cryptoSubtle.importKey("pkcs8", keyDer, alg, true, ["sign"])
+		const key = await cryptoSubtle.importKey('pkcs8', keyDer, alg, true, ['sign'])
 		const x509 = this.#taxpayer.getCertPem()
-		if (!x509) throw new Error("No se encontró el certificado X509")
+		if (!x509) throw new Error('No se encontró el certificado X509')
 
 		this.xmlDocument = Parse(this.xmlDocument.toString())
 
@@ -231,9 +230,9 @@ class Receipt {
 					this.xmlDocument!,
 					{
 						references: [
-							{ id: "terexoris", uri: "", hash: hashAlgorithm, transforms: ["enveloped", canonMethod] }
+							{ id: 'terexoris', uri: '', hash: hashAlgorithm, transforms: ['enveloped', canonMethod] }
 						],
-						x509: [x509],
+						x509: [x509]
 						// signerRole: { claimed: ["Taxpayer"] },
 						/*
 						 * It exists, but Sunat does not handle big numbers (20 bytes) in serial numbers so was removed.
@@ -245,10 +244,10 @@ class Receipt {
 				)
 			})
 			.then((signature) => {
-				if (!this.xmlDocument) throw new Error("Documento XML no existe")
+				if (!this.xmlDocument) throw new Error('Documento XML no existe')
 				
-				const xmlEl = this.xmlDocument.getElementsByTagNameNS("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionContent")[0]
-				if (!xmlEl) throw new Error("No se encontró el elemento ExtensionContent")
+				const xmlEl = this.xmlDocument.getElementsByTagNameNS('urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2', 'ExtensionContent')[0]
+				if (!xmlEl) throw new Error('No se encontró el elemento ExtensionContent')
 				
 				xmlEl.appendChild(signature.GetXml())
 				return true
@@ -264,15 +263,15 @@ class Receipt {
 	 * @param xmlString that is raw XML.
 	 * @return A ZIP file containing XML.
 	 */
-	async createZip(type: JSZip.OutputType = "base64", xmlString?: string) {
-		if (!this.xmlDocument) throw new Error("Documento XML no existe")
+	async createZip(type: JSZip.OutputType = 'base64', xmlString?: string) {
+		if (!this.xmlDocument) throw new Error('Documento XML no existe')
 		
 		const zip = new JSZip()
-		const xmlDocumentContent = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+		const xmlDocumentContent = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' +
 			( xmlString ?? (new XMLSerializer().serializeToString(this.xmlDocument)) )
 		
 		const identification = this.#taxpayer.getIdentification()
-		if (!identification) throw new Error("El contribuyente debe tener identificación")
+		if (!identification) throw new Error('El contribuyente debe tener identificación')
 		
 		zip.file(`${identification.getNumber()}-${this.getId(true)}.xml`, xmlDocumentContent)
 
@@ -282,25 +281,25 @@ class Receipt {
 	async handleProof(zipStream: string | Uint8Array | ArrayBuffer, isBase64 = true, compacted = false) {
 		const zip = new JSZip()
 		const identification = this.#taxpayer.getIdentification()
-		if (!identification) throw new Error("El contribuyente debe tener identificación")
+		if (!identification) throw new Error('El contribuyente debe tener identificación')
 
 		return zip.loadAsync(zipStream, {base64: isBase64}).then(async (zip) => {
 			const file = zip.file(`R-${identification.getNumber()}-${this.getId(true, compacted)}.xml`)
-			if (!file) throw new Error("Archivo no encontrado en el ZIP")
+			if (!file) throw new Error('Archivo no encontrado en el ZIP')
 			
-			return file.async("string").then(async (data) => {
-				const xmlDoc = new DOMParser().parseFromString(data, "application/xml")
-				const codes = xmlDoc.getElementsByTagNameNS("urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2", "ResponseCode")
+			return file.async('string').then(async (data) => {
+				const xmlDoc = new DOMParser().parseFromString(data, 'application/xml')
+				const codes = xmlDoc.getElementsByTagNameNS('urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2', 'ResponseCode')
 
 				if (codes.length > 0) {
-					const description = xmlDoc.getElementsByTagNameNS("urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2", "Description")[0]?.textContent ?? "Sin descripción"
+					const description = xmlDoc.getElementsByTagNameNS('urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2', 'Description')[0]?.textContent ?? 'Sin descripción'
 					const code = codes[0].textContent
-					if (!code) throw new Error("Código de respuesta no encontrado")
+					if (!code) throw new Error('Código de respuesta no encontrado')
 					
 					return [ parseInt(code), description ]  // 0 when everthing is really OK
 				}
 				else {
-					return [ -1, "No se encontró respuesta." ]
+					return [ -1, 'No se encontró respuesta.' ]
 				}
 			})
 		})
@@ -309,28 +308,28 @@ class Receipt {
 	async declare(zipStream: string) {
 		const soapXmlDocument = SoapEnvelope.generateSendBill(this, this.#taxpayer, zipStream)
 		const responseText = await Endpoint.fetch(Endpoint.INDEX_INVOICE, soapXmlDocument.toString())
-		const xmlDoc = new DOMParser().parseFromString(responseText, "text/xml")
-		const faultNode = xmlDoc.getElementsByTagName("soap-env:Fault")[0]
+		const xmlDoc = new DOMParser().parseFromString(responseText, 'text/xml')
+		const faultNode = xmlDoc.getElementsByTagName('soap-env:Fault')[0]
 
 		if (faultNode) {
-			const faultString = faultNode.getElementsByTagName("faultstring")[0]?.textContent
-			throw new Error(faultString || "Error desconocido")
+			const faultString = faultNode.getElementsByTagName('faultstring')[0]?.textContent
+			throw new Error(faultString || 'Error desconocido')
 		}
 		else {
-			const responseNode = xmlDoc.getElementsByTagName("br:sendBillResponse")[0]
+			const responseNode = xmlDoc.getElementsByTagName('br:sendBillResponse')[0]
 			if (responseNode) {
-				const applicationResponse = responseNode.getElementsByTagName("applicationResponse")[0]?.textContent
-				if (!applicationResponse) throw new Error("No se encontró la respuesta de la aplicación")
+				const applicationResponse = responseNode.getElementsByTagName('applicationResponse')[0]?.textContent
+				if (!applicationResponse) throw new Error('No se encontró la respuesta de la aplicación')
 				return applicationResponse
 			}
 			else {
-				throw new Error("Respuesta inesperada.")
+				throw new Error('Respuesta inesperada.')
 			}
 		}
 	}
 
 	toString() {
-		if (!this.xmlDocument) throw new Error("Documento XML no existe")
+		if (!this.xmlDocument) throw new Error('Documento XML no existe')
 		return new XMLSerializer().serializeToString(this.xmlDocument)
 	}
 
@@ -339,18 +338,18 @@ class Receipt {
 	 * @return xmlDoc parsed.
 	 */
 	fromXml(xmlContent: string) {
-		const xmlDoc = new DOMParser().parseFromString(xmlContent, "text/xml")
-		const idElement = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]
+		const xmlDoc = new DOMParser().parseFromString(xmlContent, 'text/xml')
+		const idElement = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]
 		const id = idElement?.textContent
 		
-		if (!id) throw new Error("ID no encontrado en el XML")
+		if (!id) throw new Error('ID no encontrado en el XML')
 		
 		const [serie, numeration] = id.split('-')
 		this.setSerie(serie)
 		this.setNumeration(parseInt(numeration))
 
-		const digestValue = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.ds, "DigestValue")[0]
-		if (!digestValue?.textContent) throw new Error("DigestValue no encontrado")
+		const digestValue = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.ds, 'DigestValue')[0]
+		if (!digestValue?.textContent) throw new Error('DigestValue no encontrado')
 		
 		this.setHash(digestValue.textContent)
 		return xmlDoc
@@ -358,28 +357,28 @@ class Receipt {
 
 	validate(validateNumeration = true) {
 		if (!this.#serie || this.#serie.length != 4) {
-			throw new Error("Serie inconsistente.")
+			throw new Error('Serie inconsistente.')
 		}
 
 		if (validateNumeration && (!this.#numeration || this.#numeration <= 0 || this.#numeration > 99999999)) {
-			throw new Error("Numeración fuera de rango.")
+			throw new Error('Numeración fuera de rango.')
 		}
 
 		if (!(this.#issueDate instanceof Date)) {
-			throw new Error("No hay fecha de emisión.")
+			throw new Error('No hay fecha de emisión.')
 		}
 	}
 
 	static namespaces: NameSpaces = Object.freeze({
-		cac: "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
-		cbc: "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
-		ds: "http://www.w3.org/2000/09/xmldsig#",
-		ext: "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2",
-		qdt: "urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2",
-		udt: "urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2",
-		xsi: "http://www.w3.org/2001/XMLSchema-instance",
-		xmlns: "http://www.w3.org/1999/xhtml",
-		ccts: "urn:un:unece:uncefact:documentation:2"
+		cac: 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
+		cbc: 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
+		ds: 'http://www.w3.org/2000/09/xmldsig#',
+		ext: 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2',
+		qdt: 'urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2',
+		udt: 'urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2',
+		xsi: 'http://www.w3.org/2001/XMLSchema-instance',
+		xmlns: 'http://www.w3.org/1999/xhtml',
+		ccts: 'urn:un:unece:uncefact:documentation:2'
 	})
 
 	static removeCdataTag(cdata: string) {
@@ -396,7 +395,7 @@ class Receipt {
 		const month = date.getMonth() + 1
 		const year = date.getFullYear()
 
-		return year + "-" + ( (month < 10 ? "0" : "") + month ) + "-" + ( (day < 10 ? "0" : "") + day )
+		return year + '-' + ( (month < 10 ? '0' : '') + month ) + '-' + ( (day < 10 ? '0' : '') + day )
 	}
 
 	/**
@@ -407,7 +406,7 @@ class Receipt {
 		const min = date.getMinutes()
 		const sec = date.getSeconds()
 
-		return ( (hour < 10 ? "0" : "") + hour ) + ":" + ( (min < 10 ? "0" : "") + min ) + ":" + ( (sec < 10 ? "0" : "") + sec )
+		return ( (hour < 10 ? '0' : '') + hour ) + ':' + ( (min < 10 ? '0' : '') + min ) + ':' + ( (sec < 10 ? '0' : '') + sec )
 	}
 
 	/**
@@ -418,8 +417,8 @@ class Receipt {
 			return `CERO ${junctor} 00/100 ${tail}`
 		}
 
-		return writtenNumber(amount | 0, { lang: "es" }) + ` ${junctor} ${amount.toFixed(decimals).split('.')[1]}/100 ${tail}`
+		return writtenNumber(amount | 0, { lang: 'es' }) + ` ${junctor} ${amount.toFixed(decimals).split('.')[1]}/100 ${tail}`
 	}
 }
 
-export default Receipt;
+export default Receipt

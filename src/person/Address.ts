@@ -1,81 +1,81 @@
 class Address {
-	#line = '';
-	#country = '';
-	#ubigeo = '';
-	#typecode = '';
-	#urbanization = '';
-	#city = '';
-	#subentity = '';
-	#district = '';
+	#line = ''
+	#country = ''
+	#ubigeo = ''
+	#typecode = ''
+	#urbanization = ''
+	#city = ''
+	#subentity = ''
+	#district = ''
 
 	constructor() {
 	}
 
 	get line() {
-		return this.#line;
+		return this.#line
 	}
 
 	get country() {
-		return this.#country;
+		return this.#country
 	}
 
 	get ubigeo() {
-		return this.#ubigeo;
+		return this.#ubigeo
 	}
 
 	get typecode() {
-		return this.#typecode;
+		return this.#typecode
 	}
 
 	get urbanization() {
-		return this.#urbanization;
+		return this.#urbanization
 	}
 
 	get city() {
-		return this.#city;
+		return this.#city
 	}
 
 	get subentity() {
-		return this.#subentity;
+		return this.#subentity
 	}
 
 	get district() {
-		return this.#district;
+		return this.#district
 	}
 
 	set line(line: string) {
 		if (line.length > 0) {
-			this.#line = line;
+			this.#line = line
 		}
 	}
 
 	set country(country: string) {
-		this.#country = country;
+		this.#country = country
 	}
 
 	set ubigeo(ubigeo: string) {
-		this.#ubigeo = ubigeo;
+		this.#ubigeo = ubigeo
 	}
 
 	set typecode(code: string) {
-		this.#typecode = code;
+		this.#typecode = code
 	}
 
 	set urbanization(urbanization: string) {
-		this.#urbanization = urbanization;
+		this.#urbanization = urbanization
 	}
 
 	set city(city: string) {
-		this.#city = city;
+		this.#city = city
 	}
 
 	set subentity(subentity: string) {
-		this.#subentity = subentity;
+		this.#subentity = subentity
 	}
 
 	set district(district: string) {
-		this.#district = district;
+		this.#district = district
 	}
 }
 
-export default Address;
+export default Address

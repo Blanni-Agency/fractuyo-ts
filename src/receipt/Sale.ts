@@ -1,9 +1,9 @@
-import Receipt from "./Receipt"
-import Item from "./Item"
-import Taxpayer from "../person/Taxpayer"
-import Person from "../person/Person"
-import Identification from "../person/Identification"
-import Address from "../person/Address"
+import Receipt from './Receipt'
+import Item from './Item'
+import Taxpayer from '../person/Taxpayer'
+import Person from '../person/Person'
+import Identification from '../person/Identification'
+import Address from '../person/Address'
 
 class Sale extends Receipt {
 	#currencyId: string | null = null
@@ -111,7 +111,7 @@ class Sale extends Receipt {
 	recalcMounts() {
 		// Cleaning values
 		this.#lineExtensionAmount = this.#taxTotalAmount = this.#taxInclusiveAmount = this.#igvAmount = 0
-		this.#operationAmounts[0] = this.#operationAmounts[1] = this.#operationAmounts[2] = this.#operationAmounts[3] = 0;
+		this.#operationAmounts[0] = this.#operationAmounts[1] = this.#operationAmounts[2] = this.#operationAmounts[3] = 0
 
 		for (const item of this.items) {
 			this.#lineExtensionAmount += Number(item.getLineExtensionAmount())
@@ -140,14 +140,14 @@ class Sale extends Receipt {
 		const issueDate = this.getIssueDate()
 
 		if (!taxpayer || !customer || !issueDate) {
-			throw new Error("Faltan datos requeridos para generar QR")
+			throw new Error('Faltan datos requeridos para generar QR')
 		}
 
 		const identification = taxpayer.getIdentification()
 		const customerIdentification = customer.getIdentification()
 
 		if (!identification || !customerIdentification) {
-			throw new Error("Faltan datos de identificación para generar QR")
+			throw new Error('Faltan datos de identificación para generar QR')
 		}
 
 		return identification.getNumber()
@@ -163,17 +163,17 @@ class Sale extends Receipt {
 		super.validate(validateNumeration)
 
 		if (this.items.length == 0) {
-			throw new Error("No hay ítems en esta venta.")
+			throw new Error('No hay ítems en esta venta.')
 		}
 
 		if (!this.#currencyId || this.#currencyId.length != 3) { // length according ISO
-			throw new Error("Moneda no establecida.")
+			throw new Error('Moneda no establecida.')
 		}
 
 		// Check item attributes
-		let c = 0;
+		let c = 0
 		for (const item of this.items) {
-			c++; // simple counter
+			c++ // simple counter
 			if (!item.getQuantity() || Number(item.getQuantity()) <= 0) {
 				throw new Error(`Ítem ${c} tiene cantidad errónea.`)
 			}
@@ -200,46 +200,46 @@ class Sale extends Receipt {
 	fromXml(xmlContent: string) {
 		const xmlDoc = super.fromXml(xmlContent)
 
-		const typeCode = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, `${this.name}TypeCode`)[0]?.textContent || "";
+		const typeCode = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, `${this.name}TypeCode`)[0]?.textContent || ''
 		this.setTypeCode(typeCode)
 
-		const currencyId = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, "DocumentCurrencyCode")[0]?.textContent || "";
+		const currencyId = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, 'DocumentCurrencyCode')[0]?.textContent || ''
 		this.setCurrencyId(currencyId)
 
-		const issueDate = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, "IssueDate")[0]?.textContent || "";
-		const dateParts = issueDate.split('-'); // split in year, month and day
+		const issueDate = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, 'IssueDate')[0]?.textContent || ''
+		const dateParts = issueDate.split('-') // split in year, month and day
 		this.setIssueDate(new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2])))
 
 		{
 			const taxpayer = new Taxpayer()
-			const accountingSupplierParty = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, "AccountingSupplierParty")[0];
-			const id = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent || "";
-			const type = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.getAttribute("schemeID") || "";
+			const accountingSupplierParty = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'AccountingSupplierParty')[0]
+			const id = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent || ''
+			const type = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.getAttribute('schemeID') || ''
 			taxpayer.setIdentification(new Identification(type, id))
 
-			const tradeName = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "Name")[0]?.textContent || ""
+			const tradeName = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Name')[0]?.textContent || ''
 			taxpayer.setTradeName(tradeName)
 
-			const name = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "RegistrationName")[0]?.textContent || ""
+			const name = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'RegistrationName')[0]?.textContent || ''
 			taxpayer.setName(name)
 
 			{
-				const registrationAddress = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cac, "RegistrationAddress")[0]
+				const registrationAddress = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cac, 'RegistrationAddress')[0]
 
 				const address = new Address()
-				address.ubigeo = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent || ""
-				address.city = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, "CityName")[0]?.textContent || ""
-				address.district = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, "District")[0]?.textContent || ""
-				address.subentity = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, "Subentity")[0]?.textContent || ""
-				address.line = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, "Line")[0]?.textContent || ""
+				address.ubigeo = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent || ''
+				address.city = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'CityName')[0]?.textContent || ''
+				address.district = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'District')[0]?.textContent || ''
+				address.subentity = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Subentity')[0]?.textContent || ''
+				address.line = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Line')[0]?.textContent || ''
 
 				taxpayer.setAddress(address)
 			}
 
 			{ // contact info
-				const web = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "Note")[0]?.textContent || ""
-				const email = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "ElectronicMail")[0]?.textContent || ""
-				const telephone = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "Telephone")[0]?.textContent || ""
+				const web = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Note')[0]?.textContent || ''
+				const email = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ElectronicMail')[0]?.textContent || ''
+				const telephone = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Telephone')[0]?.textContent || ''
 				
 				taxpayer.setWeb(web)
 				taxpayer.setEmail(email)
@@ -251,21 +251,21 @@ class Sale extends Receipt {
 
 		{
 			const customer = new Person()
-			const accountingCustomerParty = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, "AccountingCustomerParty")[0];
-			const id = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.textContent || "";
-			const type = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "ID")[0]?.getAttribute("schemeID") || "";
+			const accountingCustomerParty = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'AccountingCustomerParty')[0]
+			const id = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent || ''
+			const type = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.getAttribute('schemeID') || ''
 			customer.setIdentification(new Identification(type, id))
-			customer.setName(accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, "RegistrationName")[0]?.textContent || "-")
+			customer.setName(accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'RegistrationName')[0]?.textContent || '-')
 
 			// customer address
 			{
-				const registrationAddress = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cac, "RegistrationAddress")[0]
+				const registrationAddress = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cac, 'RegistrationAddress')[0]
 
 				if (registrationAddress) {
-					const address = new Address();
-					address.line = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, "Line")[0]?.textContent || "";
+					const address = new Address()
+					address.line = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Line')[0]?.textContent || ''
 
-					customer.setAddress(address);
+					customer.setAddress(address)
 				}
 			}
 

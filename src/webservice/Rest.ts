@@ -1,12 +1,12 @@
-import { Application } from "xmldsigjs"
-import Taxpayer from "../person/Taxpayer"
-import Receipt from "../receipt/Receipt"
+import { Application } from 'xmldsigjs'
+import Taxpayer from '../person/Taxpayer'
+import Receipt from '../receipt/Receipt'
 
 interface SendResponse {
 	archivo: {
-		nomArchivo: string;
-		hashZip: string;
-		arcGreZip: string;
+		nomArchivo: string
+		hashZip: string
+		arcGreZip: string
 	}
 }
 
@@ -18,18 +18,18 @@ class Rest {
 	 * @throws Error si el contribuyente no tiene identificación
 	 */
 	static generateToken(taxpayer: Taxpayer): URLSearchParams {
-		const identification = taxpayer.getIdentification();
+		const identification = taxpayer.getIdentification()
 		if (!identification) {
-			throw new Error('El contribuyente no tiene una identificación asociada');
+			throw new Error('El contribuyente no tiene una identificación asociada')
 		}
 		
 		const data = new URLSearchParams()
-		data.append("grant_type", "password")
-		data.append("scope", "https://api-cpe.sunat.gob.pe")
-		data.append("client_id", taxpayer.getSolId())
-		data.append("client_secret", taxpayer.getSolSecret())
-		data.append("username", `${identification.getNumber()}${taxpayer.getSolUser()}`)
-		data.append("password", taxpayer.getSolPass())
+		data.append('grant_type', 'password')
+		data.append('scope', 'https://api-cpe.sunat.gob.pe')
+		data.append('client_id', taxpayer.getSolId())
+		data.append('client_secret', taxpayer.getSolSecret())
+		data.append('username', `${identification.getNumber()}${taxpayer.getSolUser()}`)
+		data.append('password', taxpayer.getSolPass())
 
 		return data
 	}
@@ -42,11 +42,11 @@ class Rest {
 	 * @throws Error si el comprobante no tiene contribuyente o identificación asociada
 	 */
 	static async generateSend(receipt: Receipt, zipStream: string): Promise<SendResponse> {
-		let zipBuffer: ArrayBuffer;
+		let zipBuffer: ArrayBuffer
 		
 		if (typeof Buffer !== 'undefined') {
 			// for Node.js, use Buffer.from
-			zipBuffer = Buffer.from(zipStream, "base64").buffer;
+			zipBuffer = Buffer.from(zipStream, 'base64').buffer
 		}
 		else if (typeof window !== 'undefined' && typeof window.atob === 'function') {
 			// in browser
@@ -64,7 +64,7 @@ class Rest {
 			throw new Error('El entorno no es compatible con esta función.')
 		}
 
-		const hash = await Application.crypto.subtle.digest("SHA-256", zipBuffer)
+		const hash = await Application.crypto.subtle.digest('SHA-256', zipBuffer)
 
 		const bytes = new Uint8Array(hash)
 		const hexChars = new Array(bytes.length)
@@ -73,24 +73,24 @@ class Rest {
 			hexChars[i] = bytes[i].toString(16).padStart(2, '0')
 		}
 
-		const taxpayer = receipt.getTaxpayer();
+		const taxpayer = receipt.getTaxpayer()
 		if (!taxpayer) {
-			throw new Error('El comprobante no tiene un contribuyente asociado');
+			throw new Error('El comprobante no tiene un contribuyente asociado')
 		}
 
-		const identification = taxpayer.getIdentification();
+		const identification = taxpayer.getIdentification()
 		if (!identification) {
-			throw new Error('El contribuyente no tiene una identificación asociada');
+			throw new Error('El contribuyente no tiene una identificación asociada')
 		}
 
 		return {
-			"archivo" : {
-				"nomArchivo": `${identification.getNumber()}-${receipt.getId(true)}.zip`,
-				"hashZip": hexChars.join(''), // in documentation looks like base64 but documentation is bad
-				"arcGreZip": zipStream
+			'archivo' : {
+				'nomArchivo': `${identification.getNumber()}-${receipt.getId(true)}.zip`,
+				'hashZip': hexChars.join(''), // in documentation looks like base64 but documentation is bad
+				'arcGreZip': zipStream
 			}
 		}
 	}
 }
 
-export default Rest;
+export default Rest

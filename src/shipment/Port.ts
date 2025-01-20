@@ -2,34 +2,34 @@
  * When items arrive in import.
  */
 class Port {
-	#type = false; // true: port, false: airport
-	#identity = ''; // code (3 letters)
-	#name = '';
+	#type = false // true: port, false: airport
+	#identity = '' // code (3 letters)
+	#name = ''
 
 	constructor(type: boolean, identity: string) {
-		this.#type = type;
-		this.setIdentity(identity);
+		this.#type = type
+		this.setIdentity(identity)
 	}
 
 	get type() {
-		return this.#type;
+		return this.#type
 	}
 
 	setIdentity(identity: string) {
-		this.#identity = identity;
+		this.#identity = identity
 	}
 
 	get identity() {
-		return this.#identity;
+		return this.#identity
 	}
 
 	setName(name: string) {
-		this.#name = name;
+		this.#name = name
 	}
 
 	get name() {
-		return this.#name;
+		return this.#name
 	}
 }
 
-export default Port;
+export default Port

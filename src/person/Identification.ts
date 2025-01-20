@@ -1,9 +1,9 @@
 class Identification {
-	#number = '';
-	#type = '';
+	#number = ''
+	#type = ''
 
 	constructor(type: string, number: string) {
-		this.setIdentity(type, number);
+		this.setIdentity(type, number)
 	}
 
 	/**
@@ -12,66 +12,66 @@ class Identification {
 	 */
 	setIdentity(type: string, number: string) {
 		if (Identification.validateDocumentNumber(parseInt(type, 16), number)) {
-			this.#number = number;
-			this.#type = type;
-			return this;
+			this.#number = number
+			this.#type = type
+			return this
 		}
-		throw new Error("Número de identificación de persona inconsistente.");
+		throw new Error('Número de identificación de persona inconsistente.')
 	}
 
 	getNumber() {
-		return this.#number;
+		return this.#number
 	}
 
 	getType() {
-		return this.#type;
+		return this.#type
 	}
 
 	static validateDocumentNumber(documentType: number, number: string) {
 		switch(documentType) {
 			case 0:
-				return true;
+				return true
 			case 1://DNI o libreta electoral
 				//longitud: 8: exacta
 				//caracter: numérico
-				return (number != null && number.length === 8 && !isNaN(Number(number)));
+				return (number != null && number.length === 8 && !isNaN(Number(number)))
 			case 4:
 				//longitud: 12: máxima
 				//caracter: alfanumérico
-				return (number != null && number.length < 13);
+				return (number != null && number.length < 13)
 			case 6:
-				return Identification.validateRuc(number);
+				return Identification.validateRuc(number)
 			default:
-				return false;
+				return false
 		}
 	}
 
 	static validateRuc(ruc: string) {
 		if (ruc.length != 11 || parseInt(ruc) < 11) {
-			return false;
+			return false
 		}
-		if (!["10", "15", "17", "20"].includes(ruc.substring(0, 2))) {
-			return false;
+		if (!['10', '15', '17', '20'].includes(ruc.substring(0, 2))) {
+			return false
 		}
 
 		// Taken from https://www.excelnegocios.com/validacion-de-rucs-sunat-peru-sin-internet-algoritmo/
-		const maxFactor = 8;
-		let currentFactor = 1;
-		let sum = 0;
+		const maxFactor = 8
+		let currentFactor = 1
+		let sum = 0
 		for (let i = 9; i >= 0; --i) {
 			if (++currentFactor == maxFactor) {
-				currentFactor = 2;
+				currentFactor = 2
 			}
 
-			sum += currentFactor * parseInt(ruc.charAt(i));
+			sum += currentFactor * parseInt(ruc.charAt(i))
 		}
 
 		if ((11 - (sum % 11)) % 10 == parseInt(ruc.charAt(10))) {
-			return true;
+			return true
 		}
 
-		return false;
+		return false
 	}
 }
 
-export default Identification;
+export default Identification

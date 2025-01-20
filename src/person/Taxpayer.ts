@@ -1,67 +1,58 @@
-import Person from "./Person"
+import Person from './Person'
 
-import * as asn1js from "asn1js"
-
-interface ASN1Time {
-	year: number;
-	month: number;
-	day: number;
-	hour: number;
-	minute: number;
-	second: number;
-}
+import * as asn1js from 'asn1js'
 
 interface PublicKey {
-	n: bigint;
-	g: bigint;
+	n: bigint
+	g: bigint
 }
 
 interface PrivateKey {
-	lambda: bigint;
-	mu: bigint;
-	publicKey: PublicKey;
-	p: bigint;
-	q: bigint;
+	lambda: bigint
+	mu: bigint
+	publicKey: PublicKey
+	p: bigint
+	q: bigint
 }
 
 class Taxpayer extends Person {
-	#paillierPublicKey: PublicKey | null = null;
-	#paillierPrivateKey: PrivateKey | null = null;
+	#paillierPublicKey: PublicKey | null = null
+	#paillierPrivateKey: PrivateKey | null = null
 
-	#certPem: string | null = null;
-	#certDer: ArrayBuffer | null = null;
-	#keyDer: ArrayBuffer | null = null;
+	#certPem: string | null = null
+	#certDer: ArrayBuffer | null = null
+	#keyDer: ArrayBuffer | null = null
 
-	#solUser = '';
-	#solPass = '';
+	#solUser = ''
+	#solPass = ''
 
-	#solId = '';
-	#solSecret = '';
+	#solId = ''
+	#solSecret = ''
 
-	#deductionsAccount: string | null = null;
+	#deductionsAccount: string | null = null
 
-	#web: string | null = null;
-	#email: string | null = null;
-	#telephone: string | null = null;
+	#web: string | null = null
+	#email: string | null = null
+	#telephone: string | null = null
 
-	#tradeName: string | null = null;
+	#tradeName: string | null = null
 
 	createPaillierPublicKey(n: bigint, g: bigint) {
-		this.#paillierPublicKey = { n, g };
+		this.#paillierPublicKey = { n, g }
 	}
 
 	getPaillierPublicKey() {
-		return this.#paillierPublicKey;
+		return this.#paillierPublicKey
 	}
 
 	createPaillierPrivateKey(lambda: bigint, mu: bigint, n: bigint, g: bigint, p: bigint, q: bigint) {
-		const publicKey = { n, g };
-		this.#paillierPublicKey = publicKey;
-		this.#paillierPrivateKey = { lambda, mu, publicKey, p, q };
+		const publicKey = { n, g }
+		this.#paillierPublicKey = publicKey
+		this.#paillierPrivateKey = { lambda, mu, publicKey, p, q }
 	}
 
 	getPaillierPrivateKey() {
-		return this.#paillierPrivateKey;
+		return this.#paillierPrivateKey
 	}
 
 	/**
@@ -71,9 +62,9 @@ class Taxpayer extends Person {
 		// Clean the PEM string
 		const pem = base64String
 			// remove BEGIN/END
-			.replace(/-----(BEGIN|END)[\w\d\s]+-----/g, "")
+			.replace(/-----(BEGIN|END)[\w\d\s]+-----/g, '')
 			// remove \r, \n
-			.replace(/[\r\n]/g, "")
+			.replace(/[\r\n]/g, '')
 
 		if (typeof Buffer !== 'undefined') {
 			// for Node.js, use Buffer.from
@@ -151,8 +142,7 @@ class Taxpayer extends Person {
 	}
 
 	setKey(k: string) {
-		let keyPem: string
-		[ keyPem, this.#keyDer ] = Taxpayer.transformPemToDer(k)
+		[ , this.#keyDer ] = Taxpayer.transformPemToDer(k)
 	}
 
 	setSolUser(su: string) {
@@ -237,21 +227,21 @@ class Taxpayer extends Person {
 
 	clearData() {
 		// Limpiar certificados y llaves
-		this.#certPem = null;
-		this.#certDer = null;
-		this.#keyDer = null;
+		this.#certPem = null
+		this.#certDer = null
+		this.#keyDer = null
 
 		// Limpiar credenciales SOL
-		this.#solId = '';
-		this.#solSecret = '';
-		this.#solUser = '';
-		this.#solPass = '';
+		this.#solId = ''
+		this.#solSecret = ''
+		this.#solUser = ''
+		this.#solPass = ''
 
 		// Limpiar información de contacto
-		this.#web = null;
-		this.#email = null;
-		this.#telephone = null;
+		this.#web = null
+		this.#email = null
+		this.#telephone = null
 	}
 }
 
-export default Taxpayer;
+export default Taxpayer

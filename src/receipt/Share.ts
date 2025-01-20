@@ -1,32 +1,32 @@
 class Share {
-	#dueDate: Date = new Date();
-	#amount = 0;
+	#dueDate: Date = new Date()
+	#amount = 0
 
 	setDueDate(dd: Date) {
-		this.#dueDate = dd;
+		this.#dueDate = dd
 	}
 
 	getDueDate() {
-		return this.#dueDate;
+		return this.#dueDate
 	}
 
 	setAmount(a: string | number) {
-		this.#amount = parseFloat(a.toString());
+		this.#amount = parseFloat(a.toString())
 		if (isNaN(this.#amount)) {
-			throw new Error("Cantidad de cuota no es un número.");
+			throw new Error('Cantidad de cuota no es un número.')
 		}
 		if (this.#amount <= 0) {
-			throw new Error("Monto de cuota no puede ser 0.");
+			throw new Error('Monto de cuota no puede ser 0.')
 		}
 	}
 
 	getAmount() {
-		return this.#amount;
+		return this.#amount
 	}
 
 	getAmountWithFormat() {
-		return this.#amount.toFixed(2);
+		return this.#amount.toFixed(2)
 	}
 }
 
-export default Share;
+export default Share

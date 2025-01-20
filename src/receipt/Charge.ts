@@ -1,7 +1,7 @@
 class Charge {
 	#indicator: boolean
 	#amount = 0
-	#typeCode: string = ""
+	#typeCode: string = ''
 	#factor = 0
 
 	/**
@@ -49,4 +49,4 @@ class Charge {
 	}
 }
 
-export default Charge;
+export default Charge

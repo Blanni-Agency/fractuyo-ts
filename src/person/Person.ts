@@ -1,40 +1,40 @@
-import Address from './Address';
-import Identification from './Identification';
+import Address from './Address'
+import Identification from './Identification'
 
 class Person {
-	#name = '';
-	#address: Address | null = null;
-	#identification: Identification | null = null;
+	#name = ''
+	#address: Address | null = null
+	#identification: Identification | null = null
 
 	getName() {
-		return this.#name;
+		return this.#name
 	}
 
 	setName(name: string) {
 		if(name.length > 0) {
-			this.#name = name;
+			this.#name = name
 		}
 	}
 
 	setIdentification(identification: Identification) {
-		this.#identification = identification;
+		this.#identification = identification
 	}
 
 	getIdentification() {
 		if (!this.#identification) {
-			throw new Error('La persona no tiene una identificación asociada');
+			throw new Error('La persona no tiene una identificación asociada')
 		}
 
-		return this.#identification;
+		return this.#identification
 	}
 
 	setAddress(address: Address) {
-		this.#address = address;
+		this.#address = address
 	}
 
 	getAddress() {
-		return this.#address;
+		return this.#address
 	}
 }
 
-export default Person;
+export default Person

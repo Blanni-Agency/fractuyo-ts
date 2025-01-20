@@ -1,28 +1,28 @@
-import Rest from "./Rest"
-import Receipt from "../receipt/Receipt"
-import Taxpayer from "../person/Taxpayer"
+import Rest from './Rest'
+import Receipt from '../receipt/Receipt'
+import Taxpayer from '../person/Taxpayer'
 
 interface UrlConfig {
-	deploy: string;
-	test: string;
+	deploy: string
+	test: string
 }
 
 interface TokenResponse {
-	access_token: string;
-	[key: string]: unknown;
+	access_token: string
+	[key: string]: unknown
 }
 
 interface StatusResponse {
-	success: boolean;
-	message?: string;
-	data?: unknown;
+	success: boolean
+	message?: string
+	data?: unknown
 }
 
 interface SendResponse {
-	success: boolean;
-	message?: string;
-	ticket?: string;
-	data?: unknown;
+	success: boolean
+	message?: string
+	ticket?: string
+	data?: unknown
 }
 
 class Endpoint {
@@ -84,12 +84,12 @@ class Endpoint {
 
 	static #urls: UrlConfig[] = [
 		{ // invoice
-			deploy: "https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService",
-			test: "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService"
+			deploy: 'https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService',
+			test: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
 		},
 		{ // retention
-			deploy: "https://e-factura.sunat.gob.pe/ol-ti-itemision-otroscpe-gem/billService",
-			test: "https://e-beta.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService"
+			deploy: 'https://e-factura.sunat.gob.pe/ol-ti-itemision-otroscpe-gem/billService',
+			test: 'https://e-beta.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
 		}
 	]
 
@@ -98,17 +98,17 @@ class Endpoint {
 	 */
 	static #restUrls: UrlConfig[] = [
 		{ // despatch token
-			deploy: "https://api-seguridad.sunat.gob.pe/v1/clientessol/<client_id>/oauth2/token",
-			test: "https://gre-test.nubefact.com/v1/clientessol/<client_id>/oauth2/token"
+			deploy: 'https://api-seguridad.sunat.gob.pe/v1/clientessol/<client_id>/oauth2/token',
+			test: 'https://gre-test.nubefact.com/v1/clientessol/<client_id>/oauth2/token'
 		},
 		{ // despatch send
-			deploy: "https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/", // ending: {numRucEmisor}-{codCpe}-{numSerie}-{numCpe}
-			test: "https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/"
+			deploy: 'https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/', // ending: {numRucEmisor}-{codCpe}-{numSerie}-{numCpe}
+			test: 'https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/'
 		},
 		{ // despatch status
-			deploy: "https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/", // ending: {numTicket}
-			test: "https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/"
-		},
+			deploy: 'https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/', // ending: {numTicket}
+			test: 'https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/'
+		}
 	]
 
 	static getUrl(service: number, mode?: boolean): string {
@@ -134,8 +134,8 @@ class Endpoint {
 		const url = Endpoint.getUrl(service)
 
 		const response = await Endpoint.#fetchFunction(url, {
-			method: "POST",
-			headers: {"Content-Type": "text/xml;charset=UTF-8"},
+			method: 'POST',
+			headers: {'Content-Type': 'text/xml;charset=UTF-8'},
 			body: body
 		})
 		const responseText = await response.text()
@@ -147,10 +147,10 @@ class Endpoint {
 		const url = Endpoint.getUrl(Endpoint.INDEX_STATUS)
 
 		const response = await Endpoint.#fetchFunction(url.concat(ticket), {
-			method: "GET",
+			method: 'GET',
 			headers: {
-				"Content-Type": "application/json", 
-				"Authorization": `Bearer ${Endpoint.#token}`
+				'Content-Type': 'application/json', 
+				'Authorization': `Bearer ${Endpoint.#token}`
 			}
 		})
 		const responseJson = await response.json()
@@ -161,23 +161,23 @@ class Endpoint {
 	static async fetchSend(body: string, receipt: Receipt): Promise<SendResponse> {
 		const url = Endpoint.getUrl(Endpoint.INDEX_SEND)
 
-		const taxpayer = receipt.getTaxpayer();
+		const taxpayer = receipt.getTaxpayer()
 		if (!taxpayer) {
-			throw new Error('El comprobante no tiene un contribuyente asociado');
+			throw new Error('El comprobante no tiene un contribuyente asociado')
 		}
 
-		const identification = taxpayer.getIdentification();
+		const identification = taxpayer.getIdentification()
 		if (!identification) {
-			throw new Error('El contribuyente no tiene una identificación asociada');
+			throw new Error('El contribuyente no tiene una identificación asociada')
 		}
 
 		const response = await Endpoint.#fetchFunction(
 			url.concat(`${identification.getNumber()}-${receipt.getId(true)}`), 
 			{
-				method: "POST",
+				method: 'POST',
 				headers: {
-					"Content-Type": "application/json", 
-					"Authorization": `Bearer ${Endpoint.#token}`
+					'Content-Type': 'application/json', 
+					'Authorization': `Bearer ${Endpoint.#token}`
 				},
 				body: body
 			}
@@ -192,9 +192,9 @@ class Endpoint {
 
 		const data = Rest.generateToken(taxpayer)
 
-		const response = await Endpoint.#fetchFunction(url.replace("<client_id>", taxpayer.getSolId()), {
-			method: "POST",
-			headers: {"Content-Type": "application/x-www-form-urlencoded"},
+		const response = await Endpoint.#fetchFunction(url.replace('<client_id>', taxpayer.getSolId()), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 			body: data
 		})
 		const responseJson = await response.json()
