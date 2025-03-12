@@ -3,4 +3,4 @@ export enum DocumentType {
     DNI = 1,
     CARNET_EXTRANJERIA = 4,
     RUC = 6
-} 
+}

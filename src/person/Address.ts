@@ -44,7 +44,7 @@ class Address {
 	}
 
 	set line(line: string) {
-		if (line.length > 0) {
+		if(line.length > 0) {
 			this.#line = line
 		}
 	}

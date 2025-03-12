@@ -24,14 +24,14 @@ class Item {
 	}
 
 	setDescription(d: string) {
-		if (d.length > 0) {
+		if(d.length > 0) {
 			this.#description = d
 			return
 		}
 	}
 
 	setCode(c: string) {
-		if (c.length > 0) {
+		if(c.length > 0) {
 			this.#code = c
 		}
 	}
@@ -46,10 +46,10 @@ class Item {
 
 	setQuantity(q: string | number) {
 		this.#quantity = parseFloat(q.toString())
-		if (isNaN(this.#quantity)) {
+		if(isNaN(this.#quantity)) {
 			throw new Error('Cantidad no es un número.')
 		}
-		if (this.#quantity <= 0) {
+		if(this.#quantity <= 0) {
 			throw new Error('No puede haber 0 como cantidad.')
 		}
 	}
@@ -85,7 +85,7 @@ class Item {
 	}
 
 	setIscPercentage(ip: number) {
-		if (ip >= 0 || ip <= 100) {
+		if(ip >= 0 || ip <= 100) {
 			this.#iscPercentage = ip
 			return
 		}
@@ -97,7 +97,7 @@ class Item {
 	}
 
 	setIgvPercentage(ip: number) {
-		if (ip >= 0 || ip <= 100) {
+		if(ip >= 0 || ip <= 100) {
 			this.#igvPercentage = ip
 			return
 		}
@@ -118,10 +118,10 @@ class Item {
 
 	setUnitValue(uv: string | number, withoutIgv = false) {
 		const value = parseFloat(uv.toString())
-		if (!withoutIgv) {
+		if(!withoutIgv) {
 			this.#unitValue = value
 		} else {
-			if (isNaN(this.#igvPercentage)) {
+			if(isNaN(this.#igvPercentage)) {
 				throw new Error('Se requiere previamente porcentaje del IGV.')
 			}
 			this.#unitValue = value / (1 + this.#igvPercentage / 100)
@@ -137,7 +137,7 @@ class Item {
 		let decimalIgvPercentage = 0
 
 		// Only apply when we are including taxes
-		if (this.#exemptionReasonCode < 20) {
+		if(this.#exemptionReasonCode < 20) {
 			decimalIscPercentage = this.#iscPercentage / 100 // eg: 0.17
 			decimalIgvPercentage = this.#igvPercentage / 100 // eg: 0.18
 		}

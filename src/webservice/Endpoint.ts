@@ -3,26 +3,26 @@ import Receipt from '../receipt/Receipt'
 import Taxpayer from '../person/Taxpayer'
 
 interface UrlConfig {
-	deploy: string
-	test: string
+	deploy: string;
+	test  : string;
 }
 
 interface TokenResponse {
-	access_token: string
-	[key: string]: unknown
+	access_token : string;
+	[key: string]: unknown;
 }
 
 interface StatusResponse {
-	success: boolean
-	message?: string
-	data?: unknown
+	success : boolean;
+	message?: string;
+	data?   : unknown;
 }
 
 interface SendResponse {
-	success: boolean
-	message?: string
-	ticket?: string
-	data?: unknown
+	success : boolean;
+	message?: string;
+	ticket? : string;
+	data?   : unknown;
 }
 
 class Endpoint {
@@ -33,13 +33,13 @@ class Endpoint {
 
 	static #offset: number = 4
 
-	static readonly INDEX_INVOICE: number = 0
+	static readonly INDEX_INVOICE  : number = 0
 	static readonly INDEX_RETENTION: number = 1
 
-	static readonly INDEX_TOKEN: number = 1 << Endpoint.#offset
-	static readonly INDEX_SEND: number = 2 << Endpoint.#offset
+	static readonly INDEX_TOKEN : number = 1 << Endpoint.#offset
+	static readonly INDEX_SEND  : number = 2 << Endpoint.#offset
 	static readonly INDEX_STATUS: number = 3 << Endpoint.#offset
-	static readonly #REST_MASK: number = 0b111 << Endpoint.#offset // despatch is here
+	static readonly #REST_MASK  : number = 0b111 << Endpoint.#offset // despatch is here
 
 	static #fetchFunction: typeof fetch = fetch // use the default or standard JavaScript fetch
 
@@ -58,8 +58,8 @@ class Endpoint {
 	 */
 	static setUrl(service: number, url: string, deploymentMode: boolean = false): void {
 		// setting classic services
-		if (service === Endpoint.INDEX_INVOICE || service === Endpoint.INDEX_RETENTION) {
-			if (deploymentMode) {
+		if(service === Endpoint.INDEX_INVOICE || service === Endpoint.INDEX_RETENTION) {
+			if(deploymentMode) {
 				Endpoint.#urls[service].deploy = url
 			}
 			else {
@@ -70,10 +70,10 @@ class Endpoint {
 		}
 
 		// setting "new" services
-		if ((service & Endpoint.#REST_MASK) !== 0) {
+		if((service & Endpoint.#REST_MASK) !== 0) {
 			service >>= Endpoint.#offset
 			--service
-			if (deploymentMode) {
+			if(deploymentMode) {
 				Endpoint.#restUrls[service].deploy = url
 			}
 			else {
@@ -85,11 +85,11 @@ class Endpoint {
 	static #urls: UrlConfig[] = [
 		{ // invoice
 			deploy: 'https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService',
-			test: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
+			test  : 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
 		},
 		{ // retention
 			deploy: 'https://e-factura.sunat.gob.pe/ol-ti-itemision-otroscpe-gem/billService',
-			test: 'https://e-beta.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
+			test  : 'https://e-beta.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
 		}
 	]
 
@@ -99,29 +99,29 @@ class Endpoint {
 	static #restUrls: UrlConfig[] = [
 		{ // despatch token
 			deploy: 'https://api-seguridad.sunat.gob.pe/v1/clientessol/<client_id>/oauth2/token',
-			test: 'https://gre-test.nubefact.com/v1/clientessol/<client_id>/oauth2/token'
+			test  : 'https://gre-test.nubefact.com/v1/clientessol/<client_id>/oauth2/token'
 		},
 		{ // despatch send
 			deploy: 'https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/', // ending: {numRucEmisor}-{codCpe}-{numSerie}-{numCpe}
-			test: 'https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/'
+			test  : 'https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/'
 		},
 		{ // despatch status
 			deploy: 'https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/', // ending: {numTicket}
-			test: 'https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/'
+			test  : 'https://gre-test.nubefact.com/v1/contribuyente/gem/comprobantes/envios/'
 		}
 	]
 
 	static getUrl(service: number, mode?: boolean): string {
 		// Use what is in current scope
-		if (mode === undefined) {
+		if(mode === undefined) {
 			mode = Endpoint.#mode
 		}
 
-		if (service === Endpoint.INDEX_INVOICE || service === Endpoint.INDEX_RETENTION) {
+		if(service === Endpoint.INDEX_INVOICE || service === Endpoint.INDEX_RETENTION) {
 			return mode ? Endpoint.#urls[service].deploy : Endpoint.#urls[service].test
 		}
 
-		if ((service & Endpoint.#REST_MASK) !== 0) {
+		if((service & Endpoint.#REST_MASK) !== 0) {
 			service >>= Endpoint.#offset
 			--service
 			return mode ? Endpoint.#restUrls[service].deploy : Endpoint.#restUrls[service].test
@@ -134,9 +134,9 @@ class Endpoint {
 		const url = Endpoint.getUrl(service)
 
 		const response = await Endpoint.#fetchFunction(url, {
-			method: 'POST',
-			headers: {'Content-Type': 'text/xml;charset=UTF-8'},
-			body: body
+			method : 'POST',
+			headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+			body   : body
 		})
 		const responseText = await response.text()
 
@@ -147,9 +147,9 @@ class Endpoint {
 		const url = Endpoint.getUrl(Endpoint.INDEX_STATUS)
 
 		const response = await Endpoint.#fetchFunction(url.concat(ticket), {
-			method: 'GET',
+			method : 'GET',
 			headers: {
-				'Content-Type': 'application/json', 
+				'Content-Type' : 'application/json',
 				'Authorization': `Bearer ${Endpoint.#token}`
 			}
 		})
@@ -162,21 +162,21 @@ class Endpoint {
 		const url = Endpoint.getUrl(Endpoint.INDEX_SEND)
 
 		const taxpayer = receipt.getTaxpayer()
-		if (!taxpayer) {
+		if(!taxpayer) {
 			throw new Error('El comprobante no tiene un contribuyente asociado')
 		}
 
 		const identification = taxpayer.getIdentification()
-		if (!identification) {
+		if(!identification) {
 			throw new Error('El contribuyente no tiene una identificación asociada')
 		}
 
 		const response = await Endpoint.#fetchFunction(
-			url.concat(`${identification.getNumber()}-${receipt.getId(true)}`), 
+			url.concat(`${identification.getNumber()}-${receipt.getId(true)}`),
 			{
-				method: 'POST',
+				method : 'POST',
 				headers: {
-					'Content-Type': 'application/json', 
+					'Content-Type' : 'application/json',
 					'Authorization': `Bearer ${Endpoint.#token}`
 				},
 				body: body
@@ -193,9 +193,9 @@ class Endpoint {
 		const data = Rest.generateToken(taxpayer)
 
 		const response = await Endpoint.#fetchFunction(url.replace('<client_id>', taxpayer.getSolId()), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-			body: data
+			method : 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body   : data
 		})
 		const responseJson = await response.json()
 

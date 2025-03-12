@@ -17,7 +17,7 @@ class Sale extends Receipt {
 	#igvAmount = 0
 	#iscAmount = 0
 	#icbpAmount = 0
-	#operationAmounts = [0, 0, 0, 0]
+	#operationAmounts = [ 0, 0, 0, 0 ]
 
 	constructor(taxpayer: Taxpayer, customer: Person, name: string) {
 		super(taxpayer, customer, name)
@@ -93,7 +93,7 @@ class Sale extends Receipt {
 		this.#igvAmount += Number(item.getIgvAmount())
 
 		//Assign data according taxability
-		switch(true) {
+		switch (true) {
 			case (item.getExemptionReasonCode() < 20):
 				this.#operationAmounts[0] += Number(item.getLineExtensionAmount());break
 			case (item.getExemptionReasonCode() < 30):
@@ -121,7 +121,7 @@ class Sale extends Receipt {
 			this.#igvAmount += Number(item.getIgvAmount())
 
 			//Assign data according taxability
-			switch(true) {
+			switch (true) {
 				case (item.getExemptionReasonCode() < 20):
 					this.#operationAmounts[0] += Number(item.getLineExtensionAmount());break
 				case (item.getExemptionReasonCode() < 30):
@@ -139,14 +139,14 @@ class Sale extends Receipt {
 		const customer = this.getCustomer()
 		const issueDate = this.getIssueDate()
 
-		if (!taxpayer || !customer || !issueDate) {
+		if(!taxpayer || !customer || !issueDate) {
 			throw new Error('Faltan datos requeridos para generar QR')
 		}
 
 		const identification = taxpayer.getIdentification()
 		const customerIdentification = customer.getIdentification()
 
-		if (!identification || !customerIdentification) {
+		if(!identification || !customerIdentification) {
 			throw new Error('Faltan datos de identificación para generar QR')
 		}
 
@@ -162,11 +162,11 @@ class Sale extends Receipt {
 	validate(validateNumeration: boolean) {
 		super.validate(validateNumeration)
 
-		if (this.items.length == 0) {
+		if(this.items.length == 0) {
 			throw new Error('No hay ítems en esta venta.')
 		}
 
-		if (!this.#currencyId || this.#currencyId.length != 3) { // length according ISO
+		if(!this.#currencyId || this.#currencyId.length != 3) { // length according ISO
 			throw new Error('Moneda no establecida.')
 		}
 
@@ -174,19 +174,19 @@ class Sale extends Receipt {
 		let c = 0
 		for (const item of this.items) {
 			c++ // simple counter
-			if (!item.getQuantity() || Number(item.getQuantity()) <= 0) {
+			if(!item.getQuantity() || Number(item.getQuantity()) <= 0) {
 				throw new Error(`Ítem ${c} tiene cantidad errónea.`)
 			}
-			if (!item.getUnitCode() || item.getUnitCode().length == 0) {
+			if(!item.getUnitCode() || item.getUnitCode().length == 0) {
 				throw new Error(`Ítem ${c} sin unidad de medida.`)
 			}
-			if (!item.getLineExtensionAmount() || Number(item.getLineExtensionAmount()) <= 0) {
+			if(!item.getLineExtensionAmount() || Number(item.getLineExtensionAmount()) <= 0) {
 				throw new Error(`Ítem ${c} tiene valor de venta erróneo.`)
 			}
-			if (!item.getPricingReferenceAmount() || Number(item.getPricingReferenceAmount()) <= 0) {
+			if(!item.getPricingReferenceAmount() || Number(item.getPricingReferenceAmount()) <= 0) {
 				throw new Error(`Ítem ${c} tiene precio de venta unitario erróneo.`)
 			}
-			if (!item.getDescription() || item.getDescription().length == 0) {
+			if(!item.getDescription() || item.getDescription().length == 0) {
 				throw new Error(`Ítem ${c} no tiene descripción.`)
 			}
 		}
@@ -240,7 +240,7 @@ class Sale extends Receipt {
 				const web = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Note')[0]?.textContent || ''
 				const email = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ElectronicMail')[0]?.textContent || ''
 				const telephone = accountingSupplierParty.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Telephone')[0]?.textContent || ''
-				
+
 				taxpayer.setWeb(web)
 				taxpayer.setEmail(email)
 				taxpayer.setTelephone(telephone)
@@ -261,7 +261,7 @@ class Sale extends Receipt {
 			{
 				const registrationAddress = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cac, 'RegistrationAddress')[0]
 
-				if (registrationAddress) {
+				if(registrationAddress) {
 					const address = new Address()
 					address.line = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Line')[0]?.textContent || ''
 

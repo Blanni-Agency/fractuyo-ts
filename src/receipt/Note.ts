@@ -16,21 +16,21 @@ class Note extends Sale {
 	 */
 	constructor(taxpayer: Taxpayer, customer: Person, isCredit?: boolean) {
 		super(taxpayer, customer, '')
-		if (isCredit !== undefined) {
+		if(isCredit !== undefined) {
 			this.setName(isCredit ? 'CreditNote' : 'DebitNote')
 			this.setTypeCode(isCredit ? '7' : '8')
 		}
 	}
 
 	setTypeCode(code: string) {
-		if (code === '7' || code === '8') {
+		if(code === '7' || code === '8') {
 			super.setTypeCode(code)
 			this.setName(code === '7' ? 'CreditNote' : 'DebitNote')
 		}
 	}
 
 	setDescription(description: string) {
-		if (description.length > 250) {
+		if(description.length > 250) {
 			this.#description = description.substring(0, 249)
 			return
 		}
@@ -47,7 +47,7 @@ class Note extends Sale {
 	}
 
 	getResponseCode(withFormat = false) {
-		if (withFormat) {
+		if(withFormat) {
 			return String(this.#responseCode).padStart(2, '0')
 		}
 		return this.#responseCode
@@ -66,7 +66,7 @@ class Note extends Sale {
 	}
 
 	getDocumentReferenceTypeCode(withFormat = false) {
-		if (withFormat) {
+		if(withFormat) {
 			return String(this.#documentReferenceTypeCode).padStart(2, '0')
 		}
 		return this.#documentReferenceTypeCode

@@ -18,10 +18,10 @@ declare module 'written-number' {
     | 'id'
 
   export type WrittenNumberOptions = {
-    noAnd?: boolean
-    alternativeBase?: Record<string, string> | null
-    lang?: DefaultLanguage | string
+    noAnd?          : boolean;
+    alternativeBase?: Record<string, string> | null;
+    lang?           : DefaultLanguage | string;
   }
 
   export default function writtenNumber(n: number, options?: WrittenNumberOptions): string
-} 
+}

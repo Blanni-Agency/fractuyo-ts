@@ -16,7 +16,7 @@ class Despatch extends Receipt {
 	#note: string = '' // description
 
 	#unitCode: string = '' // maybe kgm
-	#weight: number = 0 // value of unit code
+	#weight  : number = 0 // value of unit code
 
 	#startDate: Date | null = null
 
@@ -45,7 +45,7 @@ class Despatch extends Receipt {
 	}
 
 	setNote(note: string) {
-		if (note.length > 250) {
+		if(note.length > 250) {
 			this.#note = note.substring(0, 249)
 			return
 		}
@@ -86,7 +86,7 @@ class Despatch extends Receipt {
 	}
 
 	getDeliveryAddress() {
-		if (!this.#deliveryAddress) {
+		if(!this.#deliveryAddress) {
 			throw new Error('No hay dirección de entrega definida')
 		}
 		return this.#deliveryAddress
@@ -100,7 +100,7 @@ class Despatch extends Receipt {
 	 * @param real in true to force getting what was set instead fiscal address.
 	 */
 	getDespatchAddress(real: boolean = false) {
-		if (this.#despatchAddress || real) {
+		if(this.#despatchAddress || real) {
 			return this.#despatchAddress || this.getTaxpayer().getAddress()!
 		}
 
@@ -112,7 +112,7 @@ class Despatch extends Receipt {
 	}
 
 	getCarrier(): Person {
-		if (!this.#carrier) {
+		if(!this.#carrier) {
 			throw new Error('El transportista no está definido')
 		}
 		return this.#carrier
@@ -201,27 +201,27 @@ class Despatch extends Receipt {
 	validate(validateNumeration: boolean = true) {
 		super.validate(validateNumeration)
 
-		if (!(this.#startDate instanceof Date)) {
+		if(!(this.#startDate instanceof Date)) {
 			throw new Error('No hay fecha de partida.')
 		}
 
-		if (!this.#weight || this.#weight <= 0) {
+		if(!this.#weight || this.#weight <= 0) {
 			throw new Error('No tiene peso correcto.')
 		}
 
-		if (!this.#unitCode || this.#unitCode.length == 0) {
+		if(!this.#unitCode || this.#unitCode.length == 0) {
 			throw new Error('No tiene unidad de medida de peso.')
 		}
 
-		if (!this.#handlingCode) {
+		if(!this.#handlingCode) {
 			throw new Error('No está definido el motivo.')
 		}
 
-		if (this.#deliveryAddress instanceof Address) {
-			if (!this.#deliveryAddress.line || this.#deliveryAddress.line.length == 0) {
+		if(this.#deliveryAddress instanceof Address) {
+			if(!this.#deliveryAddress.line || this.#deliveryAddress.line.length == 0) {
 				throw new Error('No hay línea en dirección de destino.')
 			}
-			if (!this.#deliveryAddress.ubigeo || this.#deliveryAddress.ubigeo.length != 6) {
+			if(!this.#deliveryAddress.ubigeo || this.#deliveryAddress.ubigeo.length != 6) {
 				throw new Error('No hay ubigeo en dirección de destino.')
 			}
 		}
@@ -229,7 +229,7 @@ class Despatch extends Receipt {
 			throw new Error('No hay dirección de destino.')
 		}
 
-		if (this.items.length == 0) {
+		if(this.items.length == 0) {
 			throw new Error('No hay ítems en este despacho.')
 		}
 
@@ -238,19 +238,19 @@ class Despatch extends Receipt {
 		for (const item of this.items) {
 			c++ // simple counter
 			const quantity = item.getQuantity()
-			if (typeof quantity === 'string') {
-				if (!parseFloat(quantity) || parseFloat(quantity) <= 0) {
+			if(typeof quantity === 'string') {
+				if(!parseFloat(quantity) || parseFloat(quantity) <= 0) {
 					throw new Error(`Ítem ${c} tiene cantidad errónea.`)
 				}
 			} else {
-				if (!quantity || quantity <= 0) {
+				if(!quantity || quantity <= 0) {
 					throw new Error(`Ítem ${c} tiene cantidad errónea.`)
 				}
 			}
-			if (!item.getUnitCode() || item.getUnitCode().length == 0) {
+			if(!item.getUnitCode() || item.getUnitCode().length == 0) {
 				throw new Error(`Ítem ${c} sin unidad de medida.`)
 			}
-			if (!item.getDescription() || item.getDescription().length == 0) {
+			if(!item.getDescription() || item.getDescription().length == 0) {
 				throw new Error(`Ítem ${c} no tiene descripción.`)
 			}
 		}
@@ -275,7 +275,7 @@ class Despatch extends Receipt {
 
 		// Find note as child. Not deeper level.
 		const probableNote = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Note')[0]
-		if (
+		if(
 			probableNote && // exists
 			probableNote.parentNode?.localName === 'DespatchAdvice'
 		) {
@@ -329,7 +329,7 @@ class Despatch extends Receipt {
 			{
 				const registrationAddress = accountingCustomerParty.getElementsByTagNameNS(Receipt.namespaces.cac, 'RegistrationAddress')[0]
 
-				if (registrationAddress) {
+				if(registrationAddress) {
 					const address = new Address()
 					address.line = registrationAddress.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Line')[0]?.textContent || ''
 
@@ -361,7 +361,7 @@ class Despatch extends Receipt {
 
 			// look for if vehicle is M1 or L
 			const specialInstruction = shipment.getElementsByTagNameNS(Receipt.namespaces.cbc, 'SpecialInstructions')[0]?.textContent
-			if (specialInstruction == 'SUNAT_Envio_IndicadorTrasladoVehiculoM1L') {
+			if(specialInstruction == 'SUNAT_Envio_IndicadorTrasladoVehiculoM1L') {
 				this.#inLightVehicle = true
 			}
 
@@ -371,7 +371,7 @@ class Despatch extends Receipt {
 
 			const transportMode = shipment.getElementsByTagNameNS(Receipt.namespaces.cbc, 'TransportModeCode')[0]?.textContent
 			// We will check more data about carrier if is public transport
-			if (transportMode === '01') {
+			if(transportMode === '01') {
 				const carrierParty = shipment.getElementsByTagNameNS(Receipt.namespaces.cac, 'CarrierParty')[0]
 
 				const carrier = new Person()

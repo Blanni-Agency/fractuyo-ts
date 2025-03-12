@@ -16,7 +16,7 @@ class SoapEnvelope {
 		// main components of this body
 		const fileName = xmlDoc.createElement('fileName')
 		const identification = taxpayer.getIdentification()
-		if (!identification) throw new Error('El contribuyente debe tener identificación')
+		if(!identification) throw new Error('El contribuyente debe tener identificación')
 		fileName.textContent = `${identification.getNumber()}-${receipt.getId(true)}.zip`
 
 		const contentFile = xmlDoc.createElement('contentFile')
@@ -43,7 +43,7 @@ class SoapEnvelope {
 
 		const username = xmlDoc.createElement('wsse:Username')
 		const identification = taxpayer.getIdentification()
-		if (!identification) throw new Error('El contribuyente debe tener identificación')
+		if(!identification) throw new Error('El contribuyente debe tener identificación')
 		username.textContent = `${identification.getNumber()}${taxpayer.getSolUser()}`
 
 		const password = xmlDoc.createElement('wsse:Password')
@@ -62,8 +62,8 @@ class SoapEnvelope {
 	static namespaces = Object.freeze(
 		{
 			soapenv: 'http://schemas.xmlsoap.org/soap/envelope/',
-			ser: 'http://service.sunat.gob.pe',
-			wsse: 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd'
+			ser    : 'http://service.sunat.gob.pe',
+			wsse   : 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd'
 		}
 	)
 }

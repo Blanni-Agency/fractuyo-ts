@@ -12,10 +12,10 @@ class Share {
 
 	setAmount(a: string | number) {
 		this.#amount = parseFloat(a.toString())
-		if (isNaN(this.#amount)) {
+		if(isNaN(this.#amount)) {
 			throw new Error('Cantidad de cuota no es un número.')
 		}
-		if (this.#amount <= 0) {
+		if(this.#amount <= 0) {
 			throw new Error('Monto de cuota no puede ser 0.')
 		}
 	}

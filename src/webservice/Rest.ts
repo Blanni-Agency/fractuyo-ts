@@ -4,10 +4,10 @@ import Receipt from '../receipt/Receipt'
 
 interface SendResponse {
 	archivo: {
-		nomArchivo: string
-		hashZip: string
-		arcGreZip: string
-	}
+		nomArchivo: string;
+		hashZip   : string;
+		arcGreZip : string;
+	};
 }
 
 class Rest {
@@ -19,10 +19,10 @@ class Rest {
 	 */
 	static generateToken(taxpayer: Taxpayer): URLSearchParams {
 		const identification = taxpayer.getIdentification()
-		if (!identification) {
+		if(!identification) {
 			throw new Error('El contribuyente no tiene una identificación asociada')
 		}
-		
+
 		const data = new URLSearchParams()
 		data.append('grant_type', 'password')
 		data.append('scope', 'https://api-cpe.sunat.gob.pe')
@@ -43,12 +43,12 @@ class Rest {
 	 */
 	static async generateSend(receipt: Receipt, zipStream: string): Promise<SendResponse> {
 		let zipBuffer: ArrayBuffer
-		
-		if (typeof Buffer !== 'undefined') {
+
+		if(typeof Buffer !== 'undefined') {
 			// for Node.js, use Buffer.from
 			zipBuffer = Buffer.from(zipStream, 'base64').buffer
 		}
-		else if (typeof window !== 'undefined' && typeof window.atob === 'function') {
+		else if(typeof window !== 'undefined' && typeof window.atob === 'function') {
 			// in browser
 			const binaryString = window.atob(zipStream)
 			const len = binaryString.length
@@ -74,20 +74,20 @@ class Rest {
 		}
 
 		const taxpayer = receipt.getTaxpayer()
-		if (!taxpayer) {
+		if(!taxpayer) {
 			throw new Error('El comprobante no tiene un contribuyente asociado')
 		}
 
 		const identification = taxpayer.getIdentification()
-		if (!identification) {
+		if(!identification) {
 			throw new Error('El contribuyente no tiene una identificación asociada')
 		}
 
 		return {
-			'archivo' : {
+			'archivo': {
 				'nomArchivo': `${identification.getNumber()}-${receipt.getId(true)}.zip`,
-				'hashZip': hexChars.join(''), // in documentation looks like base64 but documentation is bad
-				'arcGreZip': zipStream
+				'hashZip'   : hexChars.join(''), // in documentation looks like base64 but documentation is bad
+				'arcGreZip' : zipStream
 			}
 		}
 	}

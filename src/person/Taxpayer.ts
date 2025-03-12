@@ -3,25 +3,25 @@ import Person from './Person'
 import * as asn1js from 'asn1js'
 
 interface PublicKey {
-	n: bigint
-	g: bigint
+	n: bigint;
+	g: bigint;
 }
 
 interface PrivateKey {
-	lambda: bigint
-	mu: bigint
-	publicKey: PublicKey
-	p: bigint
-	q: bigint
+	lambda   : bigint;
+	mu       : bigint;
+	publicKey: PublicKey;
+	p        : bigint;
+	q        : bigint;
 }
 
 class Taxpayer extends Person {
-	#paillierPublicKey: PublicKey | null = null
+	#paillierPublicKey : PublicKey | null = null
 	#paillierPrivateKey: PrivateKey | null = null
 
 	#certPem: string | null = null
 	#certDer: ArrayBuffer | null = null
-	#keyDer: ArrayBuffer | null = null
+	#keyDer : ArrayBuffer | null = null
 
 	#solUser = ''
 	#solPass = ''
@@ -31,8 +31,8 @@ class Taxpayer extends Person {
 
 	#deductionsAccount: string | null = null
 
-	#web: string | null = null
-	#email: string | null = null
+	#web      : string | null = null
+	#email    : string | null = null
 	#telephone: string | null = null
 
 	#tradeName: string | null = null
@@ -66,11 +66,11 @@ class Taxpayer extends Person {
 			// remove \r, \n
 			.replace(/[\r\n]/g, '')
 
-		if (typeof Buffer !== 'undefined') {
+		if(typeof Buffer !== 'undefined') {
 			// for Node.js, use Buffer.from
 			return [ pem, Buffer.from(pem, 'base64') ]
 		}
-		else if (typeof window !== 'undefined' && typeof window.atob === 'function') {
+		else if(typeof window !== 'undefined' && typeof window.atob === 'function') {
 			// in browser
 			const binaryString = window.atob(pem)
 			const len = binaryString.length

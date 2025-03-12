@@ -1,1 +1,1 @@
-export { DocumentType } from './document' 
+export { DocumentType } from './document'

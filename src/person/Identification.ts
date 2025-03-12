@@ -9,7 +9,7 @@ class Identification {
 	}
 
 	setIdentity(type: DocumentType, number: string) {
-		if (Identification.validateDocumentNumber(type, number)) {
+		if(Identification.validateDocumentNumber(type, number)) {
 			this.#number = number
 			this.#type = type
 			return this
@@ -26,7 +26,7 @@ class Identification {
 	}
 
 	static validateDocumentNumber(documentType: DocumentType, number: string) {
-		switch(documentType) {
+		switch (documentType) {
 			case DocumentType.OTROS:
 				return true
 			case DocumentType.DNI://DNI o libreta electoral
@@ -45,10 +45,10 @@ class Identification {
 	}
 
 	static validateRuc(ruc: string) {
-		if (ruc.length != 11 || parseInt(ruc) < 11) {
+		if(ruc.length != 11 || parseInt(ruc) < 11) {
 			return false
 		}
-		if (!['10', '15', '17', '20'].includes(ruc.substring(0, 2))) {
+		if(![ '10', '15', '17', '20' ].includes(ruc.substring(0, 2))) {
 			return false
 		}
 
@@ -57,14 +57,14 @@ class Identification {
 		let currentFactor = 1
 		let sum = 0
 		for (let i = 9; i >= 0; --i) {
-			if (++currentFactor == maxFactor) {
+			if(++currentFactor == maxFactor) {
 				currentFactor = 2
 			}
 
 			sum += currentFactor * parseInt(ruc.charAt(i))
 		}
 
-		if ((11 - (sum % 11)) % 10 == parseInt(ruc.charAt(10))) {
+		if((11 - (sum % 11)) % 10 == parseInt(ruc.charAt(10))) {
 			return true
 		}
 

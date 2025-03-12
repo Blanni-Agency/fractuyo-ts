@@ -1,7 +1,7 @@
 class Charge {
 	#indicator: boolean
 	#amount = 0
-	#typeCode: string = ''
+	#typeCode : string = ''
 	#factor = 0
 
 	/**

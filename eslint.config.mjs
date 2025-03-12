@@ -25,11 +25,28 @@ export default [
       '@stylistic/semi': ['error', 'never'],
       '@stylistic/quotes': ['error', 'single'],
       '@stylistic/comma-dangle': ['error', 'never'],
-      '@stylistic/member-delimiter-style': ['error', {
-        multiline: {
-          delimiter: 'none'
+      '@stylistic/member-delimiter-style': 'error',
+      '@stylistic/key-spacing': [
+        'error',
+        {
+          'align': 'colon',
         }
-      }]
+      ],
+      '@stylistic/object-curly-spacing'  : [ 'error', 'always' ],
+      '@stylistic/keyword-spacing'       : [
+        'error',
+        {
+          overrides: {
+            if: { after: false }
+          }
+        }
+      ],
+      'array-bracket-spacing'     : [ 2, 'always' ],
+      'arrow-spacing'             : 'error',
+      '@stylistic/space-infix-ops': 2,
+      'no-trailing-spaces': 2,
+      'space-before-blocks': [ 2, 'always' ],
+      'eol-last'           : 2,
     }
   }
 ] 

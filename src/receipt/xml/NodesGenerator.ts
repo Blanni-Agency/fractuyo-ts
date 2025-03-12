@@ -23,7 +23,7 @@ class NodesGenerator {
 
 	static generateDates(invoice: Receipt) {
 		const issueDate = invoice.getIssueDate()
-		if (!issueDate) throw new Error('Fecha de emisión no definida')
+		if(!issueDate) throw new Error('Fecha de emisión no definida')
 
 		const cbcIssueDate = invoice.xmlDocument.createElement('cbc:IssueDate')
 		cbcIssueDate.textContent = Receipt.displayDate(issueDate)
@@ -33,9 +33,9 @@ class NodesGenerator {
 		cbcIssueTime.textContent = Receipt.displayTime(issueDate)
 		invoice.xmlDocument.documentElement.appendChild(cbcIssueTime)
 
-		if (invoice instanceof Invoice) {
+		if(invoice instanceof Invoice) {
 			const dueDate = invoice.getDueDate()
-			if (invoice.getTypeCode() === '1' && dueDate && invoice.getShares().length === 0) {
+			if(invoice.getTypeCode() === '1' && dueDate && invoice.getShares().length === 0) {
 				const cbcDueDate = invoice.xmlDocument.createElement('cbc:DueDate')
 				cbcDueDate.textContent = Receipt.displayDate(dueDate)
 				invoice.xmlDocument.documentElement.appendChild(cbcDueDate)
@@ -48,11 +48,11 @@ class NodesGenerator {
 		cbcInvoiceTypeCode.textContent = invoice.getTypeCode(true)
 		invoice.xmlDocument.documentElement.appendChild(cbcInvoiceTypeCode)
 
-		if (!(invoice.getTypeCode() === '1' || invoice.getTypeCode() === '3')) {
+		if(!(invoice.getTypeCode() === '1' || invoice.getTypeCode() === '3')) {
 			return
 		}
 
-		if (invoice instanceof Invoice && invoice.getDetractionAmount()) {
+		if(invoice instanceof Invoice && invoice.getDetractionAmount()) {
 			cbcInvoiceTypeCode.setAttribute('listID', '1001')
 		}
 		else {
@@ -63,8 +63,8 @@ class NodesGenerator {
 	static generateNotes(invoice: any) {
 		const cbcNote = invoice.xmlDocument.createElement('cbc:Note')
 
-		if (invoice.getTypeCode() === '9' || invoice.getTypeCode() === '31') {
-			if (!invoice.getNote()) { // if empty
+		if(invoice.getTypeCode() === '9' || invoice.getTypeCode() === '31') {
+			if(!invoice.getNote()) { // if empty
 				return
 			}
 
@@ -77,7 +77,7 @@ class NodesGenerator {
 		cbcNote.appendChild( invoice.xmlDocument.createCDATASection(Receipt.amountToWords(invoice.taxInclusiveAmount, 'con', invoice.getCurrencyId())) )
 		invoice.xmlDocument.documentElement.appendChild(cbcNote)
 
-		if ((invoice.getTypeCode() === '1' || invoice.getTypeCode() === '3') && invoice.getDetractionAmount()) {
+		if((invoice.getTypeCode() === '1' || invoice.getTypeCode() === '3') && invoice.getDetractionAmount()) {
 			const cbcNote = invoice.xmlDocument.createElement('cbc:Note')
 			cbcNote.setAttribute('languageLocaleID', '2006')
 			cbcNote.appendChild( invoice.xmlDocument.createCDATASection('Operación sujeta a detracción') )
@@ -92,7 +92,7 @@ class NodesGenerator {
 	}
 
 	static generateReference(invoice: any) {
-		if ((invoice.getTypeCode() == 1 || invoice.getTypeCode() == 3) && invoice.getOrderReference()) { // for invoice
+		if((invoice.getTypeCode() == 1 || invoice.getTypeCode() == 3) && invoice.getOrderReference()) { // for invoice
 			const cacOrderReference = invoice.xmlDocument.createElement('cac:OrderReference')
 			invoice.xmlDocument.documentElement.appendChild(cacOrderReference)
 
@@ -102,7 +102,7 @@ class NodesGenerator {
 				cacOrderReference.appendChild(cbcId)
 			}
 
-			if (invoice.getOrderReferenceText()) {
+			if(invoice.getOrderReferenceText()) {
 				const cbcCustomerReference = invoice.xmlDocument.createElement('cbc:CustomerReference')
 				cbcCustomerReference.appendChild( invoice.xmlDocument.createCDATASection(invoice.getOrderReferenceText()) )
 				cacOrderReference.appendChild(cbcCustomerReference)
@@ -111,7 +111,7 @@ class NodesGenerator {
 			return
 		}
 
-		if ((invoice.getTypeCode() == 7 || invoice.getTypeCode() == 8)) { // for note
+		if((invoice.getTypeCode() == 7 || invoice.getTypeCode() == 8)) { // for note
 			const cacBillingReference = invoice.xmlDocument.createElement('cac:BillingReference')
 			invoice.xmlDocument.documentElement.appendChild(cacBillingReference)
 			{
@@ -185,12 +185,12 @@ class NodesGenerator {
 		cacParty.appendChild(cacPartyIdentification)
 
 		const taxpayer = invoice.getTaxpayer()
-		if (!taxpayer) {
+		if(!taxpayer) {
 			throw new Error('El comprobante no tiene un contribuyente asociado')
 		}
 
 		const identification = taxpayer.getIdentification()
-		if (!identification) {
+		if(!identification) {
 			throw new Error('El contribuyente no tiene una identificación asociada')
 		}
 
@@ -259,24 +259,24 @@ class NodesGenerator {
 			}
 		}
 
-		if ( taxpayer.getWeb() || taxpayer.getEmail() || taxpayer.getTelephone() ) {
+		if( taxpayer.getWeb() || taxpayer.getEmail() || taxpayer.getTelephone() ) {
 			//Contact or marketing
 			const cacContact = invoice.xmlDocument.createElement('cac:Contact')
 			cacParty.appendChild(cacContact)
 			{
-				if (taxpayer.getTelephone()) {
+				if(taxpayer.getTelephone()) {
 					const cbcTelephone = invoice.xmlDocument.createElement('cbc:Telephone')
 					cbcTelephone.textContent = taxpayer.getTelephone()
 					cacContact.appendChild(cbcTelephone)
 				}
 
-				if (taxpayer.getEmail()) {
+				if(taxpayer.getEmail()) {
 					const cbcElectronicMail = invoice.xmlDocument.createElement('cbc:ElectronicMail')
 					cbcElectronicMail.textContent = taxpayer.getEmail()
 					cacContact.appendChild(cbcElectronicMail)
 				}
 
-				if (taxpayer.getWeb()) {
+				if(taxpayer.getWeb()) {
 					const cbcNote = invoice.xmlDocument.createElement('cbc:Note')
 					cbcNote.textContent = taxpayer.getWeb()
 					cacContact.appendChild(cbcNote)
@@ -301,12 +301,12 @@ class NodesGenerator {
 		cacParty.appendChild(cacPartyIdentification)
 
 		const customer = invoice.getCustomer()
-		if (!customer) {
+		if(!customer) {
 			throw new Error('El comprobante no tiene un cliente asociado')
 		}
 
 		const identification = customer.getIdentification()
-		if (!identification) {
+		if(!identification) {
 			throw new Error('El cliente no tiene una identificación asociada')
 		}
 
@@ -358,7 +358,7 @@ class NodesGenerator {
 			cbcGrossWeightMeasure.textContent = despatch.getWeight()
 			cacShipment.appendChild(cbcGrossWeightMeasure)
 
-			if (!despatch.getCarrier() && despatch.inLightVehicle()) { // we are sending in own light vehicle
+			if(!despatch.getCarrier() && despatch.inLightVehicle()) { // we are sending in own light vehicle
 				const cbcSpecialInstructions = despatch.xmlDocument.createElement('cbc:SpecialInstructions')
 				cbcSpecialInstructions.textContent = 'SUNAT_Envio_IndicadorTrasladoVehiculoM1L'
 				cacShipment.appendChild(cbcSpecialInstructions)
@@ -382,13 +382,13 @@ class NodesGenerator {
 					cacTransitPeriod.appendChild(cbcStartDate)
 				}
 
-				if (despatch.getCarrier()) {
+				if(despatch.getCarrier()) {
 					const cacCarrierParty = despatch.xmlDocument.createElement('cac:CarrierParty')
 					cacShipmentStage.appendChild(cacCarrierParty)
 					{
 						const cacPartyIdentification = despatch.xmlDocument.createElement('cac:PartyIdentification')
 						cacCarrierParty.appendChild(cacPartyIdentification)
-						
+
 						{
 							const cbcID = despatch.xmlDocument.createElement('cbc:ID')
 							cbcID.setAttribute('schemeID', '6')
@@ -406,7 +406,7 @@ class NodesGenerator {
 					}
 				}
 
-				if (despatch.getDrivers().length > 0) {
+				if(despatch.getDrivers().length > 0) {
 					let driverIndex = 0
 					for (const driver of despatch.getDrivers()) {
 						const cacDriverPerson = despatch.xmlDocument.createElement('cac:DriverPerson')
@@ -509,7 +509,7 @@ class NodesGenerator {
 				}
 			}
 
-			if (despatch.getVehicles().length > 0) {
+			if(despatch.getVehicles().length > 0) {
 				const cacTransportHandlingUnit = despatch.xmlDocument.createElement('cac:TransportHandlingUnit')
 				cacShipment.appendChild(cacTransportHandlingUnit)
 				{
@@ -520,7 +520,7 @@ class NodesGenerator {
 						cbcID.textContent = despatch.getVehicles()[0].identity
 						cacTransportEquipment.appendChild(cbcID)
 
-						if (despatch.getVehicles()[0].registrationIdentity) {
+						if(despatch.getVehicles()[0].registrationIdentity) {
 							const cacApplicableTransportMeans = despatch.xmlDocument.createElement('cac:ApplicableTransportMeans')
 							cacTransportEquipment.appendChild(cacApplicableTransportMeans)
 							{
@@ -531,10 +531,10 @@ class NodesGenerator {
 						}
 
 						// More vehicles
-						if (despatch.getVehicles().length > 1) {
+						if(despatch.getVehicles().length > 1) {
 							let index = 0
 							for (const vehicle of despatch.getVehicles()) {
-								if (index == 0) { // We need to iterate secondary vehicles
+								if(index == 0) { // We need to iterate secondary vehicles
 									++index
 									continue
 								}
@@ -546,7 +546,7 @@ class NodesGenerator {
 									cbcID.textContent = vehicle.identity
 									cacAttachedTransportEquipment.appendChild(cbcID)
 
-									if (vehicle.registrationIdentity) {
+									if(vehicle.registrationIdentity) {
 										const cacApplicableTransportMeans = despatch.xmlDocument.createElement('cac:ApplicableTransportMeans')
 										cacAttachedTransportEquipment.appendChild(cacApplicableTransportMeans)
 										{
@@ -556,7 +556,7 @@ class NodesGenerator {
 										}
 									}
 
-									if (vehicle.authorization) {
+									if(vehicle.authorization) {
 										const cacShipmentDocumentReference = despatch.xmlDocument.createElement('cac:ShipmentDocumentReference')
 										cacAttachedTransportEquipment.appendChild(cacShipmentDocumentReference)
 										{
@@ -570,7 +570,7 @@ class NodesGenerator {
 							}
 						}
 
-						if (despatch.getVehicles()[0].authorization) {
+						if(despatch.getVehicles()[0].authorization) {
 							const cacShipmentDocumentReference = despatch.xmlDocument.createElement('cac:ShipmentDocumentReference')
 							cacTransportEquipment.appendChild(cacShipmentDocumentReference)
 							{
@@ -585,7 +585,7 @@ class NodesGenerator {
 			}
 
 			const port = despatch.getPort()
-			if (port) {
+			if(port) {
 				const cacFirstArrivalPortLocation = despatch.xmlDocument.createElement('cac:FirstArrivalPortLocation')
 				cacShipment.appendChild(cacFirstArrivalPortLocation)
 				{
@@ -609,7 +609,7 @@ class NodesGenerator {
 	}
 
 	static generatePaymentMeans(invoice: Invoice) {
-		if (invoice.getDetractionAmount()) {
+		if(invoice.getDetractionAmount()) {
 			const cacPaymentMeans = invoice.xmlDocument.createElement('cac:PaymentMeans')
 			invoice.xmlDocument.documentElement.appendChild(cacPaymentMeans)
 			{
@@ -654,7 +654,7 @@ class NodesGenerator {
 	}
 
 	static generatePaymentTerms(invoice: Invoice) {
-		if (invoice.getShares().length == 0) { //Cash Payment
+		if(invoice.getShares().length == 0) { //Cash Payment
 			const cacPaymentTerms = invoice.xmlDocument.createElement('cac:PaymentTerms')
 			invoice.xmlDocument.documentElement.appendChild(cacPaymentTerms)
 			{
@@ -686,7 +686,7 @@ class NodesGenerator {
 			cbcAmount.setAttribute('currencyID', invoice.getCurrencyId())
 
 			const detractionAmount = invoice.getDetractionAmount()
-			if (detractionAmount) {
+			if(detractionAmount) {
 				cbcAmount.textContent = (invoice.taxInclusiveAmount - Number(detractionAmount)).toFixed(2)
 			}
 			else {
@@ -722,7 +722,7 @@ class NodesGenerator {
 
 	static generateCharge(invoice: Invoice) {
 		const discount = invoice.getDiscount()
-		if (discount) {
+		if(discount) {
 			const cacAllowanceCharge = invoice.xmlDocument.createElement('cac:AllowanceCharge')
 			invoice.xmlDocument.documentElement.appendChild(cacAllowanceCharge)
 			{
@@ -766,11 +766,11 @@ class NodesGenerator {
 			let taxSchemeName
 			// loop all types of taxes
 			for (let operationIndex = 0; operationIndex < 4; ++operationIndex) { // 4 steps
-				if (invoice.getOperationAmount(operationIndex) <= 0) {
+				if(invoice.getOperationAmount(operationIndex) <= 0) {
 					continue // if that slot is zero then do nothing
 				}
 
-				switch(operationIndex) {
+				switch (operationIndex) {
 					case 0: { // "gravado"
 						taxTypeCode = 'VAT'
 						taxSchemeId = '1000'
@@ -859,7 +859,7 @@ class NodesGenerator {
 
 	static generateLines(invoice: any) {
 		let itemIndex = 0 // for ID
-		for(const item of invoice.items) { //Items
+		for (const item of invoice.items) { //Items
 			const cacInvoiceLine = invoice.xmlDocument.createElement(invoice.getTypeCode() == 9 || invoice.getTypeCode() == 31 ? 'cac:DespatchLine' : `cac:${invoice.name}Line`)
 			invoice.xmlDocument.documentElement.appendChild(cacInvoiceLine)
 
@@ -881,7 +881,7 @@ class NodesGenerator {
 			cbcInvoicedQuantity.textContent = item.getQuantity(true, 10)
 			cacInvoiceLine.appendChild(cbcInvoicedQuantity)
 
-			if ( (invoice.getTypeCode() == 9 || invoice.getTypeCode() == 31)) {
+			if( (invoice.getTypeCode() == 9 || invoice.getTypeCode() == 31)) {
 				const cacOrderLineReference = invoice.xmlDocument.createElement('cac:OrderLineReference')
 				cacInvoiceLine.appendChild(cacOrderLineReference)
 
@@ -925,7 +925,7 @@ class NodesGenerator {
 					let taxTypeCode
 					let taxSchemeId
 					let taxSchemeName
-					switch(true) {
+					switch (true) {
 						case (item.getExemptionReasonCode() < 20): { // "gravado"
 							taxTypeCode = 'VAT'
 							taxSchemeId = '1000'
@@ -951,7 +951,7 @@ class NodesGenerator {
 						}
 					}
 
-					if (item.getIscAmount() > 0) { //ISC
+					if(item.getIscAmount() > 0) { //ISC
 						const cacTaxSubtotal = invoice.xmlDocument.createElement('cac:TaxSubtotal')
 						cacTaxTotal.appendChild(cacTaxSubtotal)
 
@@ -1056,7 +1056,7 @@ class NodesGenerator {
 					cacSellersItemIdentification.appendChild(cbcID)
 				}
 
-				if (item.getClassificationCode()) {
+				if(item.getClassificationCode()) {
 					const cacCommodityClassification = invoice.xmlDocument.createElement('cac:CommodityClassification')
 					cacItem.appendChild(cacCommodityClassification)
 
@@ -1069,7 +1069,7 @@ class NodesGenerator {
 				}
 			}
 
-			if ( !(invoice.getTypeCode() == 9 || invoice.getTypeCode() == 31)) {
+			if( !(invoice.getTypeCode() == 9 || invoice.getTypeCode() == 31)) {
 				{ //Price
 					const cacPrice = invoice.xmlDocument.createElement('cac:Price')
 					cacInvoiceLine.appendChild(cacPrice)

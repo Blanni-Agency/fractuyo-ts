@@ -8,14 +8,14 @@ import Taxpayer from '../person/Taxpayer'
 import Person from '../person/Person'
 
 class Invoice extends Sale {
-	#orderReference: string | null = null
+	#orderReference    : string | null = null
 	#orderReferenceText: string | null = null
-	#dueDate: Date | null = null
-	#shares: Share[] = []
+	#dueDate           : Date | null = null
+	#shares            : Share[] = []
 	#sharesAmount = 0
 	#detractionPercentage = 0
 	#detractionAmount = 0
-	#discount: Charge | null = null
+	#discount          : Charge | null = null
 
 	constructor(taxpayer: Taxpayer, customer: Person) {
 		super(taxpayer, customer, 'Invoice')
@@ -63,7 +63,7 @@ class Invoice extends Sale {
 	 * @param index in array.
 	 */
 	removeShare(index: number) {
-		this.#shares = [...this.#shares.slice(0, index), ...this.#shares.slice(index + 1)]
+		this.#shares = [ ...this.#shares.slice(0, index), ...this.#shares.slice(index + 1) ]
 	}
 
 	getDueDate() {
@@ -71,7 +71,7 @@ class Invoice extends Sale {
 	}
 
 	setDueDate(dd: Date) {
-		if (dd instanceof Date) {
+		if(dd instanceof Date) {
 			this.#dueDate = dd
 		} else {
 			this.#dueDate = null
@@ -143,8 +143,8 @@ class Invoice extends Sale {
 	}
 
 	calcDetractionAmount() {
-		if (this.#detractionPercentage > 0) {
-			if (this.taxInclusiveAmount > 700) {
+		if(this.#detractionPercentage > 0) {
+			if(this.taxInclusiveAmount > 700) {
 				this.#detractionAmount = this.taxInclusiveAmount * this.#detractionPercentage / 100
 				return // exit this function successfully
 			}
@@ -169,7 +169,7 @@ class Invoice extends Sale {
 	validate(validateNumeration: boolean) {
 		super.validate(validateNumeration)
 
-		switch(Number(this.getTypeCode())) {
+		switch (Number(this.getTypeCode())) {
 			case 1: // for "factura"
 				if(Number(this.getCustomer().getIdentification()?.getType()) !== 6) {
 					throw new Error('El cliente debe tener RUC.')
@@ -218,12 +218,12 @@ class Invoice extends Sale {
 		const xmlDoc = super.fromXml(xmlContent)
 
 		const orderReference = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'OrderReference')[0]
-		if (orderReference) {
+		if(orderReference) {
 			const orderReferenceId = orderReference.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent
-			if (orderReferenceId) {
+			if(orderReferenceId) {
 				this.setOrderReference(orderReferenceId)
 				const orderReferenceText = orderReference.getElementsByTagNameNS(Receipt.namespaces.cbc, 'CustomerReference')[0]?.textContent
-				if (orderReferenceText) {
+				if(orderReferenceText) {
 					this.setOrderReferenceText(orderReferenceText)
 				}
 			}
@@ -251,13 +251,13 @@ class Invoice extends Sale {
 		// about detractions
 		// possible deduction
 		const paymentMean = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'PaymentMeans')[0]
-		if (paymentMean) { // exists deduction
+		if(paymentMean) { // exists deduction
 			const id = paymentMean.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent
-			if (id == 'Detraccion') { // deduction exists
+			if(id == 'Detraccion') { // deduction exists
 				// look for more about this deduction
 				const paymentTerms = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'PaymentTerms')
 				for (const paymentTerm of paymentTerms) {
-					if (paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent != 'Detraccion') {
+					if(paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent != 'Detraccion') {
 						continue
 					}
 
@@ -272,21 +272,21 @@ class Invoice extends Sale {
 		// check if there are shares
 		const paymentTerms = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'PaymentTerms')
 		for (let i = 0; i < paymentTerms.length; ++i) {
-			if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent == 'FormaPago') {
+			if(paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent == 'FormaPago') {
 				// If there is Credito means that next siblings are amounts
-				if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentMeansID')[0]?.textContent == 'Credito') {
+				if(paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentMeansID')[0]?.textContent == 'Credito') {
 					++i // set index to next sibling
 					// iterate posible remaining shares
 					for (; i < paymentTerms.length; ++i) {
 						// if FormaPago is not found, means we don't have any share
-						if (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent != 'FormaPago') {
+						if(paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent != 'FormaPago') {
 							break
 						}
 						const share = new Share()
 						// capture date and amount
 						share.setAmount(paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'Amount')[0]?.textContent || '0')
 						const dateParts = (paymentTerms[i].getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentDueDate')[0]?.textContent || '').split('-')
-						if (dateParts.length === 3) {
+						if(dateParts.length === 3) {
 							share.setDueDate(new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2])))
 						}
 						this.addShare(share)
