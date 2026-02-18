@@ -3,9 +3,9 @@
  * Catálogo 54: Bienes y servicios sujetos a detracción
  */
 class Detraction {
-  private percentage: number = 0
-  private amount: number = 0.0
-  private code?: string  // Catálogo 54 (3 dígitos, ej: "037")
+  private percentage       : number = 0
+  private amount           : number = 0.0
+  private code?            : string  // Catálogo 54 (3 dígitos, ej: "037")
   private financialAccount?: string  // Cuenta bancaria BN
 
   /**
@@ -14,7 +14,7 @@ class Detraction {
    * @throws Error si el porcentaje es inválido
    */
   setPercentage(percentage: number): void {
-    if (percentage >= 0 && percentage <= 100) {
+    if(percentage >= 0 && percentage <= 100) {
       this.percentage = percentage
       return
     }
@@ -32,7 +32,7 @@ class Detraction {
    * Ejemplos: "001", "037", "040"
    */
   setCode(code: string): void {
-    if (code.length === 3) {
+    if(code.length === 3) {
       this.code = code
     }
   }
@@ -59,8 +59,8 @@ class Detraction {
    * @param taxInclusiveAmount - Monto total con impuestos incluidos
    */
   calcAmount(taxInclusiveAmount: number): void {
-    if (this.percentage > 0) {
-      if (taxInclusiveAmount > 700) {
+    if(this.percentage > 0) {
+      if(taxInclusiveAmount > 700) {
         this.amount = taxInclusiveAmount * this.percentage / 100
         return
       }

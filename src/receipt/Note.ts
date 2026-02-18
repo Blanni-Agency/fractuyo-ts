@@ -85,14 +85,14 @@ class Note extends Sale {
 		const serie = this.getSerie()
 		const refSerie = this.#documentReference?.split('-')[0]
 
-		if (refType === 1) {
+		if(refType === 1) {
 			// Notas de Factura: ambas series deben empezar con F
-			if (!(serie.startsWith('F') && refSerie?.startsWith('F'))) {
+			if(!(serie.startsWith('F') && refSerie?.startsWith('F'))) {
 				throw new Error('La serie para Nota de Factura debe empezar con F.')
 			}
-		} else if (refType === 3) {
+		} else if(refType === 3) {
 			// Notas de Boleta: ambas series deben empezar con B
-			if (!(serie.startsWith('B') && refSerie?.startsWith('B'))) {
+			if(!(serie.startsWith('B') && refSerie?.startsWith('B'))) {
 				throw new Error('La serie para Nota de Boleta de venta debe empezar con B.')
 			}
 		}

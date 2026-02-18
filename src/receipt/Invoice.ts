@@ -28,12 +28,12 @@ class Invoice extends Sale {
 	 */
 	setDetraction(detractionPercentage: number): void {
 		// Removing detraction
-		if (isNaN(detractionPercentage) || detractionPercentage <= 0) {
+		if(isNaN(detractionPercentage) || detractionPercentage <= 0) {
 			this.#detraction = undefined
 			return
 		}
 
-		if (this.#detraction == undefined) {
+		if(this.#detraction == undefined) {
 			this.#detraction = new Detraction()
 		}
 
@@ -175,7 +175,7 @@ class Invoice extends Sale {
 	}
 
 	calcDetractionAmount(): void {
-		if (this.#detraction) {
+		if(this.#detraction) {
 			this.#detraction.calcAmount(this.taxInclusiveAmount)
 		}
 	}
@@ -217,7 +217,7 @@ class Invoice extends Sale {
 		}
 
 		// Validar código de detracción
-		if (this.hasDetraction() && !this.#detraction?.getCode()) {
+		if(this.hasDetraction() && !this.#detraction?.getCode()) {
 			throw new Error('Falta código de detracción.')
 		}
 	}
@@ -298,7 +298,7 @@ class Invoice extends Sale {
 				this.setDetraction(percentage)
 
 				const code = paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentMeansID')[0]?.textContent
-				if (code) {
+				if(code) {
 					this.getDetraction()?.setCode(code)
 				}
 
@@ -310,7 +310,7 @@ class Invoice extends Sale {
 		// parsing bank account
 		const payeeFinancialAccount = paymentMean.getElementsByTagNameNS(Receipt.namespaces.cac, 'PayeeFinancialAccount')[0]
 		const account = payeeFinancialAccount?.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent
-		if (account) {
+		if(account) {
 			this.getDetraction()?.setFinancialAccount(account)
 		}
 	}

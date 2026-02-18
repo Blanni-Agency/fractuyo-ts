@@ -87,7 +87,7 @@ class Sale extends Receipt {
 		super.addItem(item)
 
 		// Avoid calculation over this header (útil en fromXml)
-		if (withoutCalculation) {
+		if(withoutCalculation) {
 			return
 		}
 
@@ -336,25 +336,25 @@ class Sale extends Receipt {
 			this.setCustomer(customer)
 		}
 
-		
+
 		// Parsing de impuestos (IGV, EXO, ISC, ICBPER)
 		{
 			const taxTotal = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxTotal')[0]
-			if (taxTotal) {
+			if(taxTotal) {
 				const taxSubtotals = taxTotal.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxSubtotal')
 
 				for (const taxSubtotal of taxSubtotals) {
 					const taxCategory = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxCategory')[0]
-					if (!taxCategory) continue
+					if(!taxCategory) continue
 
 					const taxScheme = taxCategory.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxScheme')[0]
-					if (!taxScheme) continue
+					if(!taxScheme) continue
 
 					const taxName = taxScheme.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Name')[0]?.textContent
 					const taxAmountEl = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cbc, 'TaxAmount')[0]
 					const taxableAmountEl = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cbc, 'TaxableAmount')[0]
 
-					if (!taxName) continue
+					if(!taxName) continue
 
 					const taxAmount = parseFloat(taxAmountEl?.textContent || '0')
 					const taxableAmount = parseFloat(taxableAmountEl?.textContent || '0')
