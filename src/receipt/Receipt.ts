@@ -421,4 +421,11 @@ class Receipt {
 	}
 }
 
+
+	/**
+	 * Valida el XML generado contra un esquema XSD
+	 * @param mainXsdContent - Contenido del esquema XSD principal
+	 * @param importedXsdContents - Objeto con esquemas XSD importados
+	 * @returns true si el XML es válido, false si no
+	 */
 export default Receipt

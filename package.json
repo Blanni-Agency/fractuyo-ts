@@ -55,7 +55,8 @@
 		"asn1js": "3.0.5",
 		"jszip": "3.10.1",
 		"written-number": "0.11.1",
-		"xmldsigjs": "2.6.1"
+		"xmldsigjs": "2.6.1",
+		"xmllint-wasm": "4.0.2"
 	},
 	"devDependencies": {
 		"@stylistic/eslint-plugin": "2.13.0",

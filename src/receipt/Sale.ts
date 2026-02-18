@@ -83,8 +83,13 @@ class Sale extends Receipt {
 		return this.#currencyId
 	}
 
-	addItem(item: Item) {
+	addItem(item: Item, withoutCalculation = false) {
 		super.addItem(item)
+
+		// Avoid calculation over this header (útil en fromXml)
+		if (withoutCalculation) {
+			return
+		}
 
 		this.#lineExtensionAmount += Number(item.getLineExtensionAmount())
 		this.#taxTotalAmount += Number(item.getTaxTotalAmount())
@@ -195,7 +200,66 @@ class Sale extends Receipt {
 	/**
 	 * Parse xml string for filling attributes.
 	 * If printed taxpayer is different from system current taxpayer then throw error.
-	 * @return xmlDoc from parsed document.
+	 * @
+		// Parsing de impuestos (IGV, EXO, ISC, ICBPER)
+		{
+			const taxTotal = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxTotal')[0]
+			if (taxTotal) {
+				const taxSubtotals = taxTotal.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxSubtotal')
+
+				for (const taxSubtotal of taxSubtotals) {
+					const taxCategory = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxCategory')[0]
+					if (!taxCategory) continue
+
+					const taxScheme = taxCategory.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxScheme')[0]
+					if (!taxScheme) continue
+
+					const taxName = taxScheme.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Name')[0]?.textContent
+					const taxAmountEl = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cbc, 'TaxAmount')[0]
+					const taxableAmountEl = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cbc, 'TaxableAmount')[0]
+
+					if (!taxName) continue
+
+					const taxAmount = parseFloat(taxAmountEl?.textContent || '0')
+					const taxableAmount = parseFloat(taxableAmountEl?.textContent || '0')
+
+					switch (taxName) {
+						case 'IGV':
+							// Operaciones gravadas
+							this.igvAmount = taxAmount
+							this.setOperationAmount(0, taxableAmount)
+							break
+
+						case 'EXO':
+							// Operaciones exoneradas
+							this.setOperationAmount(1, taxableAmount)
+							break
+
+						case 'INA':
+							// Operaciones inafectas
+							this.setOperationAmount(2, taxableAmount)
+							break
+
+						case 'ISC':
+							// Impuesto Selectivo al Consumo
+							this.iscAmount = taxAmount
+							break
+
+						case 'ICBPER':
+							// Impuesto a las Bolsas Plásticas
+							this.icbpAmount = taxAmount
+							break
+
+						case 'OTROS':
+							// Otros cargos
+							this.setOperationAmount(3, taxableAmount)
+							break
+					}
+				}
+			}
+		}
+
+		return xmlDoc from parsed document.
 	 */
 	fromXml(xmlContent: string) {
 		const xmlDoc = super.fromXml(xmlContent)
@@ -270,6 +334,65 @@ class Sale extends Receipt {
 			}
 
 			this.setCustomer(customer)
+		}
+
+		
+		// Parsing de impuestos (IGV, EXO, ISC, ICBPER)
+		{
+			const taxTotal = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxTotal')[0]
+			if (taxTotal) {
+				const taxSubtotals = taxTotal.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxSubtotal')
+
+				for (const taxSubtotal of taxSubtotals) {
+					const taxCategory = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxCategory')[0]
+					if (!taxCategory) continue
+
+					const taxScheme = taxCategory.getElementsByTagNameNS(Receipt.namespaces.cac, 'TaxScheme')[0]
+					if (!taxScheme) continue
+
+					const taxName = taxScheme.getElementsByTagNameNS(Receipt.namespaces.cbc, 'Name')[0]?.textContent
+					const taxAmountEl = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cbc, 'TaxAmount')[0]
+					const taxableAmountEl = taxSubtotal.getElementsByTagNameNS(Receipt.namespaces.cbc, 'TaxableAmount')[0]
+
+					if (!taxName) continue
+
+					const taxAmount = parseFloat(taxAmountEl?.textContent || '0')
+					const taxableAmount = parseFloat(taxableAmountEl?.textContent || '0')
+
+					switch (taxName) {
+						case 'IGV':
+							// Operaciones gravadas
+							this.igvAmount = taxAmount
+							this.setOperationAmount(0, taxableAmount)
+							break
+
+						case 'EXO':
+							// Operaciones exoneradas
+							this.setOperationAmount(1, taxableAmount)
+							break
+
+						case 'INA':
+							// Operaciones inafectas
+							this.setOperationAmount(2, taxableAmount)
+							break
+
+						case 'ISC':
+							// Impuesto Selectivo al Consumo
+							this.iscAmount = taxAmount
+							break
+
+						case 'ICBPER':
+							// Impuesto a las Bolsas Plásticas
+							this.icbpAmount = taxAmount
+							break
+
+						case 'OTROS':
+							// Otros cargos
+							this.setOperationAmount(3, taxableAmount)
+							break
+					}
+				}
+			}
 		}
 
 		return xmlDoc

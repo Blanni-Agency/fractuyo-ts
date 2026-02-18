@@ -4,6 +4,7 @@ import Despatch from './receipt/Despatch'
 import Item from './receipt/Item'
 import Share from './receipt/Share'
 import Charge from './receipt/Charge'
+import Detraction from './receipt/Detraction'
 import Person from './person/Person'
 import Driver from './person/Driver'
 import Taxpayer from './person/Taxpayer'
@@ -22,6 +23,7 @@ export {
   Item,
   Share,
   Charge,
+  Detraction,
   Person,
   Driver,
   Taxpayer,

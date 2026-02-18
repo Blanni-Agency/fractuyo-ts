@@ -52,7 +52,7 @@ class NodesGenerator {
 			return
 		}
 
-		if(invoice instanceof Invoice && invoice.getDetractionAmount()) {
+		if(invoice instanceof Invoice && invoice.hasDetraction()) {
 			cbcInvoiceTypeCode.setAttribute('listID', '1001')
 		}
 		else {
@@ -77,7 +77,7 @@ class NodesGenerator {
 		cbcNote.appendChild( invoice.xmlDocument.createCDATASection(Receipt.amountToWords(invoice.taxInclusiveAmount, 'con', invoice.getCurrencyId())) )
 		invoice.xmlDocument.documentElement.appendChild(cbcNote)
 
-		if((invoice.getTypeCode() === '1' || invoice.getTypeCode() === '3') && invoice.getDetractionAmount()) {
+		if((invoice.getTypeCode() === '1' || invoice.getTypeCode() === '3') && invoice.hasDetraction()) {
 			const cbcNote = invoice.xmlDocument.createElement('cbc:Note')
 			cbcNote.setAttribute('languageLocaleID', '2006')
 			cbcNote.appendChild( invoice.xmlDocument.createCDATASection('Operación sujeta a detracción') )
@@ -609,7 +609,7 @@ class NodesGenerator {
 	}
 
 	static generatePaymentMeans(invoice: Invoice) {
-		if(invoice.getDetractionAmount()) {
+		if(invoice.hasDetraction()) {
 			const cacPaymentMeans = invoice.xmlDocument.createElement('cac:PaymentMeans')
 			invoice.xmlDocument.documentElement.appendChild(cacPaymentMeans)
 			{
@@ -625,7 +625,7 @@ class NodesGenerator {
 				cacPaymentMeans.appendChild(cacPayeeFinancialAccount)
 				{
 					const cbcID = invoice.xmlDocument.createElement('cbc:ID')
-					cbcID.textContent = invoice.getTaxpayer().getDeductionsAccount()
+					cbcID.textContent = invoice.getDetraction()?.getFinancialAccount() ?? invoice.getTaxpayer().getDeductionsAccount()
 					cacPayeeFinancialAccount.appendChild(cbcID)
 				}
 			}
@@ -638,16 +638,16 @@ class NodesGenerator {
 				cacPaymentTerms.appendChild(cbcID)
 
 				const cbcPaymentMeansID = invoice.xmlDocument.createElement('cbc:PaymentMeansID')
-				cbcPaymentMeansID.textContent = '037'
+				cbcPaymentMeansID.textContent = invoice.getDetraction()?.getCode() ?? '037'
 				cacPaymentTerms.appendChild(cbcPaymentMeansID)
 
 				const cbcPaymentPercent = invoice.xmlDocument.createElement('cbc:PaymentPercent')
-				cbcPaymentPercent.textContent = invoice.getDetractionPercentage()
+				cbcPaymentPercent.textContent = String(invoice.getDetraction()?.getPercentage() ?? 0)
 				cacPaymentTerms.appendChild(cbcPaymentPercent)
 
 				const cbcAmount  = invoice.xmlDocument.createElement('cbc:Amount')
 				cbcAmount.setAttribute('currencyID', invoice.getCurrencyId())
-				cbcAmount.textContent = Number(invoice.getDetractionAmount()).toFixed(2)
+				cbcAmount.textContent = (invoice.getDetraction()?.getAmount() ?? 0).toFixed(2)
 				cacPaymentTerms.appendChild(cbcAmount)
 			}
 		}
@@ -685,9 +685,8 @@ class NodesGenerator {
 			const cbcAmount = invoice.xmlDocument.createElement('cbc:Amount')
 			cbcAmount.setAttribute('currencyID', invoice.getCurrencyId())
 
-			const detractionAmount = invoice.getDetractionAmount()
-			if(detractionAmount) {
-				cbcAmount.textContent = (invoice.taxInclusiveAmount - Number(detractionAmount)).toFixed(2)
+			if(invoice.hasDetraction()) {
+				cbcAmount.textContent = (invoice.taxInclusiveAmount - (invoice.getDetraction()?.getAmount() ?? 0)).toFixed(2)
 			}
 			else {
 				cbcAmount.textContent = invoice.taxInclusiveAmount.toFixed(2)

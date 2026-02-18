@@ -72,6 +72,32 @@ class Note extends Sale {
 		return this.#documentReferenceTypeCode
 	}
 
+	/**
+	 * Valida el comprobante antes de generar XML
+	 * REGLA SUNAT: Serie de nota debe coincidir con tipo de documento referenciado
+	 * - Nota de Factura (tipo 1): Serie debe empezar con F
+	 * - Nota de Boleta (tipo 3): Serie debe empezar con B
+	 */
+	validate(validateNumeration: boolean): void {
+		super.validate(validateNumeration)
+
+		const refType = Number(this.#documentReferenceTypeCode)
+		const serie = this.getSerie()
+		const refSerie = this.#documentReference?.split('-')[0]
+
+		if (refType === 1) {
+			// Notas de Factura: ambas series deben empezar con F
+			if (!(serie.startsWith('F') && refSerie?.startsWith('F'))) {
+				throw new Error('La serie para Nota de Factura debe empezar con F.')
+			}
+		} else if (refType === 3) {
+			// Notas de Boleta: ambas series deben empezar con B
+			if (!(serie.startsWith('B') && refSerie?.startsWith('B'))) {
+				throw new Error('La serie para Nota de Boleta de venta debe empezar con B.')
+			}
+		}
+	}
+
 	toXml() {
 		this.createXmlWrapper()
 

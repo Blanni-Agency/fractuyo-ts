@@ -4,6 +4,7 @@ import Share from './Share'
 import Sale from './Sale'
 import NodesGenerator from './xml/NodesGenerator'
 import Charge from './Charge'
+import Detraction from './Detraction'
 import Taxpayer from '../person/Taxpayer'
 import Person from '../person/Person'
 
@@ -13,29 +14,60 @@ class Invoice extends Sale {
 	#dueDate           : Date | null = null
 	#shares            : Share[] = []
 	#sharesAmount = 0
-	#detractionPercentage = 0
-	#detractionAmount = 0
+	#detraction        : Detraction | undefined
 	#discount          : Charge | null = null
 
 	constructor(taxpayer: Taxpayer, customer: Person) {
 		super(taxpayer, customer, 'Invoice')
 	}
 
-	setDetractionPercentage(dp: number) {
-		if(dp >= 0 && dp <= 100) {
-			this.#detractionPercentage = dp
+	/**
+	 * Establece la detracción
+	 * @param detractionPercentage - Porcentaje de detracción (0-100)
+	 * Si es <= 0 o NaN, elimina la detracción
+	 */
+	setDetraction(detractionPercentage: number): void {
+		// Removing detraction
+		if (isNaN(detractionPercentage) || detractionPercentage <= 0) {
+			this.#detraction = undefined
 			return
 		}
-		this.#detractionPercentage = 0
-		throw new Error('Porcentaje de detracción inconsistente.')
+
+		if (this.#detraction == undefined) {
+			this.#detraction = new Detraction()
+		}
+
+		this.#detraction.setPercentage(detractionPercentage)
 	}
 
-	getDetractionPercentage() {
-		return this.#detractionPercentage
+	/**
+	 * Obtiene el objeto Detraction completo
+	 */
+	getDetraction(): Detraction | undefined {
+		return this.#detraction
 	}
 
-	getDetractionAmount(withFormat = false) {
-		return withFormat ? this.#detractionAmount.toFixed(2) : this.#detractionAmount
+	/**
+	 * Verifica si la factura tiene detracción aplicable
+	 */
+	hasDetraction(): boolean {
+		return this.#detraction != null && this.#detraction.getAmount() > 0.0
+	}
+
+	/**
+	 * Obtiene el porcentaje de detracción
+	 * @deprecated Usar getDetraction().getPercentage()
+	 */
+	getDetractionPercentage(): number {
+		return this.#detraction?.getPercentage() ?? 0
+	}
+
+	/**
+	 * Obtiene el monto de detracción
+	 */
+	getDetractionAmount(withFormat = false): number | string {
+		const amount = this.#detraction?.getAmount() ?? 0
+		return withFormat ? amount.toFixed(2) : amount
 	}
 
 	getShares() {
@@ -142,23 +174,17 @@ class Invoice extends Sale {
 		return this.#discount
 	}
 
-	calcDetractionAmount() {
-		if(this.#detractionPercentage > 0) {
-			if(this.taxInclusiveAmount > 700) {
-				this.#detractionAmount = this.taxInclusiveAmount * this.#detractionPercentage / 100
-				return // exit this function successfully
-			}
-			this.#detractionAmount = 0.0 // to overwrite when amount decrements
-		} else {
-			this.#detractionAmount = 0.0
+	calcDetractionAmount(): void {
+		if (this.#detraction) {
+			this.#detraction.calcAmount(this.taxInclusiveAmount)
 		}
 	}
 
 	/**
 	 * Performs substraction taxInclusiveAmount with detractionAmount.
 	 */
-	getShareableAmount(withFormat = false) {
-		const shareableAmount = this.taxInclusiveAmount - this.#detractionAmount
+	getShareableAmount(withFormat = false): number | string {
+		const shareableAmount = this.taxInclusiveAmount - (this.#detraction?.getAmount() ?? 0.0)
 		return withFormat ? shareableAmount.toFixed(2) : shareableAmount
 	}
 
@@ -177,9 +203,10 @@ class Invoice extends Sale {
 		}
 
 		if(this.#sharesAmount) {
-			if(this.#detractionAmount) {
+			const detractionAmount = this.#detraction?.getAmount() ?? 0
+			if(detractionAmount) {
 				const sharesAmountFixed = Number(this.#sharesAmount.toFixed(2))
-				const detractionDiffFixed = Number((this.taxInclusiveAmount - this.#detractionAmount).toFixed(2))
+				const detractionDiffFixed = Number((this.taxInclusiveAmount - detractionAmount).toFixed(2))
 				if(sharesAmountFixed !== detractionDiffFixed) {
 					throw new Error('La suma de las cuotas difiere del total menos detracción.')
 				}
@@ -187,6 +214,11 @@ class Invoice extends Sale {
 			else if(Number(this.#sharesAmount.toFixed(2)) !== Number(this.taxInclusiveAmount.toFixed(2))) {
 				throw new Error('La suma de las cuotas difiere del total.')
 			}
+		}
+
+		// Validar código de detracción
+		if (this.hasDetraction() && !this.#detraction?.getCode()) {
+			throw new Error('Falta código de detracción.')
 		}
 	}
 
@@ -262,12 +294,26 @@ class Invoice extends Sale {
 					}
 
 					// we found it
-					this.setDetractionPercentage(parseInt(paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentPercent')[0]?.textContent || '0'))
-					this.calcDetractionAmount()
-					break // then nothing else
+				const percentage = parseInt(paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentPercent')[0]?.textContent || '0')
+				this.setDetraction(percentage)
+
+				const code = paymentTerm.getElementsByTagNameNS(Receipt.namespaces.cbc, 'PaymentMeansID')[0]?.textContent
+				if (code) {
+					this.getDetraction()?.setCode(code)
 				}
+
+				this.getDetraction()?.calcAmount(this.taxInclusiveAmount)
+				break // then nothing else
 			}
 		}
+
+		// parsing bank account
+		const payeeFinancialAccount = paymentMean.getElementsByTagNameNS(Receipt.namespaces.cac, 'PayeeFinancialAccount')[0]
+		const account = payeeFinancialAccount?.getElementsByTagNameNS(Receipt.namespaces.cbc, 'ID')[0]?.textContent
+		if (account) {
+			this.getDetraction()?.setFinancialAccount(account)
+		}
+	}
 
 		// check if there are shares
 		const paymentTerms = xmlDoc.getElementsByTagNameNS(Receipt.namespaces.cac, 'PaymentTerms')
